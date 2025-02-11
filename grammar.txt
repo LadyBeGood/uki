@@ -1,0 +1,129 @@
+
+statements
+    declaration
+
+declaration
+    function-declaration | 
+    variable-declaration |
+    statement  
+
+function-declaration
+    function-identifier ":" header-end block?
+
+variable-declaration
+    variable-identifier ":" expression
+
+statement
+    expression-statement            |
+    loop-statement                  |
+    when-statement                  |
+    exit-statement                  |
+    quit-statement                  |
+    skip-statement                  |
+    variable-reassignment-statement |
+    function-reassignment-statement |
+    block
+
+block
+    Indent declaration* Dedent
+
+expression-statement
+    expression header-end
+
+exit-statement
+    "exit" expression? header-end
+
+quit-statement
+    "exit" expression? header-end
+
+skip-statement
+    "exit" expression? header-end
+
+expression
+    logic-or
+
+variable-assignment 
+    ( call "." )? variable-identifier "=" expression
+
+logic-or
+    logic-and ( "?" logic-and )*
+
+logic-and
+    equality ( "&" equality )*
+
+equality
+    comparison ( ( "!=" | "=" ) comparison )*
+
+comparison
+    term ( ( ">" | ">!" | "<" | "!<" ) term )* 
+
+term
+    factor (("+" | "-") factor)*
+
+factor
+    unary (("*" | "/") unary)*
+
+unary
+    ("-" | "!") function-call
+
+function-call
+    primary arguments?
+
+primary
+    string | number | boolean | identifier
+
+string
+    single-line-string |
+    multi-line-string
+    
+single-line-string 
+    "\"" single-line-string-character* "\""
+
+multi-line-string
+    "\"" new-line (indent multi-line-string-character* dedent)? "\""
+
+number
+    integer-number | decimal-number
+
+multi-line-string-character
+    @ any printable character including escape-sequence
+
+single-line-string-character
+    @ any printable character including escape-sequence, excluding unescaped inverted commas and unescaped newline
+
+escape-sequence
+    "\\" ("\"" | "n" | "t" | "\\")
+
+integer-number
+    ("-")? digit+
+ 
+decimal-number   
+    ("-")? integer-number "." digit+
+
+boolean 
+    "right" | "wrong"
+
+identifier
+    function-identifier |
+    variable-identifier |
+    variable-identifier ("." variable-identifier)*
+
+variable-identifier
+    small-letter+ ("-" small-letter+ | digit*)*
+
+function-identifier
+    big-letter (small-letter | big-letter | digit)*
+
+letter
+    small-letter | big-letter | "-"
+
+small-letter
+    "a"_"z"
+
+big-letter
+    "A"_"Z" 
+
+digit
+    "0"_"9"
+
+

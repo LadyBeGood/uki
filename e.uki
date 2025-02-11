@@ -1,0 +1,26 @@
+(kind: VariableIdentifier, lexeme: "index", line: 1)
+(kind: Colon, lexeme: ":", line: 1)
+(kind: Number, lexeme: "976", line: 1)
+(kind: Newline, lexeme: "\n", line: 2)
+(kind: VariableIdentifier, lexeme: "my-name", line: 2)
+(kind: Colon, lexeme: ":", line: 2)
+(kind: String, lexeme: "uki", line: 2)
+(kind: Newline, lexeme: "\n", line: 3)
+(kind: VariableIdentifier, lexeme: "msg", line: 3)
+(kind: Colon, lexeme: ":", line: 3)
+(kind: String, lexeme: "hello", line: 3)
+(kind: EOF, lexeme: "", line: 3)
+
+
+VariableDeclarationStatement:
+    variableIdentifier: index
+    value:     LiteralExpression:
+        NumberObject(data: 976.0)
+VariableDeclarationStatement:
+    variableIdentifier: my-name
+    value:     LiteralExpression:
+        StringObject(data: "uki")
+VariableDeclarationStatement:
+    variableIdentifier: msg
+    value:     LiteralExpression:
+        StringObject(data: "hello")
