@@ -182,7 +182,7 @@ render <
 >
 
 
-display-value |= value
+display-value =| value
 
 
 
