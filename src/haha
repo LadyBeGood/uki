@@ -112,7 +112,7 @@ todo-list:
     <input v-model="newTask" @keyup.enter="addTask" placeholder="Add a task" />
     <ul>
         <li v-for="(task, index) in tasks" :key="index">
-            {{ task }}
+            {task}
             <button @click="removeTask(index)">Remove</button>
         </li>
     </ul>
