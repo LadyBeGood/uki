@@ -159,13 +159,13 @@ calculator:
     
             button white-text
                 text.content: "C"
-                event.click: {clear-display}
+                event.click = {clear-display}
                 box.colour: "#dc3545"
             button 
                 text.content: "0"
             button white-text
                 text.content: "="
-                event.click: {calculate-result}
+                event.click = {calculate-result}
                 box.colour: "#dc3545"
             button operator
                 text.content: "+"
