@@ -82,10 +82,11 @@ todo-list:
     exit <
         element 
             heading
-                heading.ty
+                heading.type: 1
                 text.content: "To-Do List" 
             
-            InputText
+            input
+                input.type: "text"
                 input.value::new-task
                 event.keypress: ["Enter", AddTask]
                 input.placeholder: "Add a task"
