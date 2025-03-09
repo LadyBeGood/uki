@@ -174,14 +174,14 @@ calculator:
                 box.colour: "#dc3545"
             button 
                 text.content: "0"
-                event.click: {append-to-display "0"}
+                event.click: {append-to-display self.text.content}
             button white-text
                 text.content: "="
                 event.click: {calculate-result}
                 box.colour: "#dc3545"
             button operator
                 text.content: "+"
-                event.click: {append-to-display "+"}
+                event.click: {append-to-display self.text.content}
     >
 
 
