@@ -223,34 +223,34 @@ parser tokens:
     isprevioustokenkind token-type:
         exit tokens.(index + 1).kind = token-type
     
-    Statement:
+    statement:
         @ expression-statement |
         @ loop-statement       |
         @ when-statement       |
         @ exit-statement       |
         @ block
         
-        when IsCurrentTokenType "loop"
-            exit LoopStatement
+        when iscurrenttokentype "loop"
+            exit loopstatement
         then IsCurrentTokenType "when"
-            exit WhenStatement
-        then IsCurrentTokenType "exit"
-            exit ReturnStatement
-        then IsCurrentTokenType "indent"
-            exit Block
+            exit whenstatement
+        then iscurrenttokentype "exit"
+            exit returnstatement
+        then iscurrenttokentype "indent"
+            exit block
         then
-            exit ExpressionStatement
+            exit expressionstatement
     
     Declaration:
         @ function-declaration | 
         @ variable-declaration |
         @ statement
         
-        when IsCurrentTokenKind "colon" 
-            when IsPreviousTokenKind "function-identifier"
+        when iscurrenttokenkind "colon" 
+            when isprevioustokenkind "function-identifier"
                 exit FunctionDeclaration
-            then IsPreviousTokenKind "variable-identifier"
-                exit VariableDeclaration
+            then isprevioustokenkind "variable-identifier"
+                exit variabledeclaration
         then
             exit Statement
         
