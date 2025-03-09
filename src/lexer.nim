@@ -204,17 +204,17 @@ proc lexer*(input: string): Tokens =
 #[
 
 
-Parser tokens:
+parser tokens:
     @ program
     @     declaration* EOF
     
     statements: []
     index: 0
 
-    IsAtEnd:
+    is-at-end:
         exit tokens.index.kind = "EOF"
     
-    IsCurrentTokenKind token-type:
+    iscurrenttokenkind token-type:
         exit tokens.index.kind = token-type
     
     IsNextTokenKind token-type:
