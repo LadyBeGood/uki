@@ -67,80 +67,133 @@ parser tokens:
 
 
 
-todo-list:
-    tasks: []
-    new-task: ""
-    
-    add-task:
-        when (trim new-task) != ""
-            insert tasks, new-task
-            new-task = ""
-    
-    remove-task index:
-        remove tasks, index
 
+calculator:
+    display-value: ""
+    
+    append-to-display value:
+        display-value += value
+    
+    clear-display:
+        display-value = ""
+    
+    calculate-result:
+        when
+            display-value = evaluate display-value
+        then
+            display-value = "Error"
+    
+    
+    white-text: <
+        text.colour: colours.white
+    >
+    
+    button = <
+        button
+            box.size-y: 60
+            box.colour: "#ddd"
+            box.corner: 5
+            text.size: 22
+            misc.cursor: "pointer"
+            transition: ["box.colour", "0.2s"]
+            state.active: {self.box.colour: "#bbb"}
+    >
+    
+    operator: <
+        white-text
+            box.colour: colours.blue
+    >
+    
     exit <
-        element 
-            heading
-                heading.type: 1
-                text.content: "To-Do List" 
+        box.size-x: 320
+        box.colour: colours.white
+        box.space-inner: 20
+        box.corner: 10
+        box.shadow: 0 4 10 rgba(0, 0, 0, 0.2)
+    
+        input
+            input.type: "text"
+            input.editable: wrong
+            input.value::display-value
+            text.align: right
+            text.size: 28
+            box.size-x: 100%
+            box.size-y: 60
+            box.space-inner: 10
+            box.space-outer-y-max: 10
+            box.colour: #eee
+            box.corner: 5
             
-            input
-                input.type: "text"
-                input.value::new-task
-                event.keypress: ["Enter", add-task]
-                input.placeholder: "Add a task"
+        element
+            display: grid
+            grid-template-columns: repeat(4, 1fr)
+            gap: 8
             
-            list
-                list.type: "unordered"
-                item {loop #tasks with [task, index]}
-                    text.content: task
-                    
-                    button
-                        event.click: {remove-task index}
+            button
+                text.content: "7"
+                event.click: {append-to-display "7"}
+            button 
+                text.content: "8"
+                event.click: {append-to-display "8"}
+            button 
+                text.content: "9"
+                event.click: {append-to-display "9"}
+            button operator
+                text.content: "/"
+                event.click: {append-to-display "/"}
+    
+            button 
+                text.content: "4"
+                event.click: {append-to-display "4"}
+            button 
+                text.content: "5"
+                event.click: {append-to-display "5"}
+            button 
+                text.content: "6"
+                event.click: {append-to-display "6"}
+            button operator
+                text.content: "*"
+                event.click: {append-to-display "*"}
+    
+            button 
+                text.content: "1"
+                event.click: {append-to-display "1"}
+            button 
+                text.content: "2"
+                event.click: {append-to-display "2"}
+            button 
+                text.content: "3"
+                event.click: {append-to-display "3"}
+            button operator
+                text.content: "-"
+                event.click: {append-to-display "-"}
+    
+            button white-text
+                text.content: "C"
+                event.click: {clear-display}
+                box.colour: "#dc3545"
+            button 
+                text.content: "0"
+                event.click: {append-to-display "0"}
+            button white-text
+                text.content: "="
+                event.click: {calculate-result}
+                box.colour: "#dc3545"
+            button operator
+                text.content: "+"
+                event.click: {append-to-display "+"}
     >
 
 
+render <
+    origin
+        meta.title: "Calculator"
+        text.fonts: ["Arial", "sans-serif"]
+        box.colour: "#f4f4f4"
+        
+        calculator
+>
 
-
-
-
-
-
-<div id="app">
-    <h1>To-Do List</h1>
-    <input v-model="newTask" @keyup.enter="addTask" placeholder="Add a task" />
-    <ul>
-        <li v-for="(task, index) in tasks" :key="index">
-            {task}
-            <button @click="removeTask(index)">Remove</button>
-        </li>
-    </ul>
-</div>
-
-<script>
-    const app = Vue.createApp({
-        data() {
-            return {
-                newTask: '',
-                tasks: []
-            };
-        },
-        methods: {
-            addTask() {
-                if (this.newTask.trim()) {
-                    this.tasks.push(this.newTask);
-                    this.newTask = '';
-                }
-            },
-            removeTask(index) {
-                this.tasks.splice(index, 1);
-            }
-        }
-    });
-
-    app.mount('#app');
-</script>
 
 
 
