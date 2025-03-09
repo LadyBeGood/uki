@@ -93,7 +93,7 @@ todo-list:
             
             list
                 list.type: "unordered"
-                tem {loop tasks with [task, index]}
+                item {loop tasks with [task, index]}
                     text.content: task
                     
                     Button
