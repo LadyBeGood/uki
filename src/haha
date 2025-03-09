@@ -160,13 +160,13 @@ calculator:
                 event.click: {append-to-display "1"}
             button 
                 text.content: "2"
-                event.click: {append-to-display "2"}
+                event.click: {append-to-display self.text.content}
             button 
                 text.content: "3"
-                event.click: {append-to-display "3"}
+                event.click: {append-to-display self.text.content}
             button operator
                 text.content: "-"
-                event.click: {append-to-display "-"}
+                event.click: {append-to-display self.text.content}
     
             button white-text
                 text.content: "C"
