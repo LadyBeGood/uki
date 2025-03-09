@@ -91,7 +91,7 @@ todo-list:
                 event.keypress: ["Enter", add-task]
                 input.placeholder: "Add a task"
             
-            ListUnordered 
+            LIST
                 Item {loop tasks with [task, index]}
                     text.content: task
                     
