@@ -217,7 +217,7 @@ parser tokens:
     iscurrenttokenkind token-type:
         exit tokens.index.kind = token-type
     
-    IsNextTokenKind token-type:
+    isnexttokenkind token-type:
         exit tokens.(index - 1).kind = token-type
     
     IsPreviousTokenKind token-type:
