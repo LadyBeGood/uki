@@ -88,7 +88,7 @@ todo-list:
             input
                 input.type: "text"
                 input.value::new-task
-                event.keypress: ["Enter", AddTask]
+                event.keypress: ["Enter", add-task]
                 input.placeholder: "Add a task"
             
             ListUnordered 
