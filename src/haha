@@ -92,66 +92,7 @@ todo-list:
                 input.placeholder: "Add a task"
             
             list
-                list.type: "parser tokens:
-    @ program
-    @     declaration* EOF
-    
-    statements: []
-    index: 0
-
-    is-at-end:
-        exit tokens.index.kind = "EOF"
-    
-    is-current-token-kind token-type:
-        exit tokens.index.kind = token-type
-    
-    is-next-token-kind token-type:
-        exit tokens.(index - 1).kind = token-type
-    
-    is-previous-token-kind token-type:
-        exit tokens.(index + 1).kind = token-type
-    
-    statement:
-        @ expression-statement |
-        @ loop-statement       |
-        @ when-statement       |
-        @ exit-statement       |
-        @ block
-        
-        when is-current-token-kind "loop"
-            exit loop-statement
-        then is-current-token-kind "when"
-            exit when-statement
-        then is-current-token-kind "exit"
-            exit return-statement
-        then is-current-token-kind "indent"
-            exit block
-        then
-            exit expression-statement
-    
-    declaration:
-        @ function-declaration | 
-        @ variable-declaration |
-        @ statement
-        
-        when is-current-token-kind "colon" 
-            when is-previous-token-kind "function-identifier"
-                exit function-declaration
-            then is-previous-token-kind "variable-identifier"
-                exit variable-declaration
-        then
-            exit statement
-        
-    loop !is-at-end
-        insert statements, declaration
-        index = index + 1
-
-    exit statements
-
-
-
-
-
+                list.type: "unordered
                 Item {loop tasks with [task, index]}
                     text.content: task
                     
