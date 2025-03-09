@@ -64,34 +64,19 @@ parser tokens:
 
 
 
-interface
-header
-master
-locker
-locker
-    header
-    master
-    footer
-footer
-    [loop] box
-        [when] image 
-        [then] box          
-            text
-            shape
-        text
 
 
 
-TodoList:
+todo-list:
     tasks: []
     new-task: ""
     
-    AddTask:
-        when (Trim new-task) != ""
-            Insert tasks, new-task
+    add-task:
+        when (trim new-task) != ""
+            insert tasks, new-task
             new-task = ""
     
-    RemoveTask index:
+    remove-task index:
         Remove tasks, index
 
     exit <
