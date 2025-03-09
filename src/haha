@@ -77,11 +77,12 @@ todo-list:
             new-task = ""
     
     remove-task index:
-        Remove tasks, index
+        remove tasks, index
 
     exit <
-        Element 
-            Heading1
+        element 
+            heading
+                heading.ty
                 text.content: "To-Do List" 
             
             InputText
