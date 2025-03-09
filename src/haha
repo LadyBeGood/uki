@@ -1,68 +1,66 @@
 
-Parser tokens:
-    @——————————————————————@
-    │ program              │
-    │     declaration* EOF │
-    @——————————————————————@
+parser tokens:
+    @ program
+    @     declaration* EOF
     
     statements: []
     index: 0
-    
-    IsAtEnd:
+
+    is-at-end:
         exit tokens.index.kind = "EOF"
     
-    IsCurrentTokenKind token-type:
+    is-current-token-kind token-type:
         exit tokens.index.kind = token-type
     
-    IsNextTokenKind token-type:
+    is-next-token-kind token-type:
         exit tokens.(index - 1).kind = token-type
     
-    IsPreviousTokenKind token-type:
-        exit tokens.(index + 1).kind = token-typel
+    is-previous-token-kind token-type:
+        exit tokens.(index + 1).kind = token-type
     
-    
-    Statement:
-        @————————————————————————————@
-        │ statement                  │
-        │     expression-statement | │
-        │     loop-statement       | │
-        │     when-statement       | │
-        │     exit-statement       | │
-        │     block                  │
-        @————————————————————————————@
+    statement:
+        @ expression-statement |
+        @ loop-statement       |
+        @ when-statement       |
+        @ exit-statement       |
+        @ block
         
-        when IsCurrentTokenType "loop"
-            exit LoopStatement
-        then IsCurrentTokenType "when"
-            exit WhenStatement
-        then IsCurrentTokenType "exit"
-            exit ReturnStatement
-        then IsCurrentTokenType "indent"
-            exit Block
+        when is-current-token-kind "loop"
+            exit loop-statement
+        then is-current-token-kind "when"
+            exit when-statement
+        then is-current-token-kind "exit"
+            exit return-statement
+        then is-current-token-kind "indent"
+            exit block
         then
-            exit ExpressionStatement
+            exit expression-statement
     
-    Declaration:
-        @————————————————————————————@
-        │ declaration                │
-        │     function-declaration | │
-        │     variable-declaration | │
-        │     statement              │
-        @————————————————————————————@
+    declaration:
+        @ function-declaration | 
+        @ variable-declaration |
+        @ statement
         
-        when IsCurrentTokenKind "colon" 
-            when IsPreviousTokenKind "function-identifier"
-                exit FunctionDeclaration
-            then IsPreviousTokenKind "variable-identifier"
-                exit VariableDeclaration
+        when is-current-token-kind "colon" 
+            when is-previous-token-kind "function-identifier"
+                exit function-declaration
+            then is-previous-token-kind "variable-identifier"
+                exit variable-declaration
         then
-            exit Statement
+            exit statement
         
-    loop !IsAtEnd
-        Insert statements, Declaration
+    loop !is-at-end
+        insert statements, declaration
         index = index + 1
 
     exit statements
+
+
+
+
+
+
+
 
 
 
@@ -113,8 +111,6 @@ TodoList:
                     Button
                         event.click: {RemoveTask index}
     >
-
-
 
 
 
