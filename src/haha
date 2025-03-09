@@ -97,7 +97,7 @@ todo-list:
                     text.content: task
                     
                     button
-                        event.click: {RemoveTask index}
+                        event.click: {removetask index}
     >
 
 
