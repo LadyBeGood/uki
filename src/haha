@@ -96,7 +96,7 @@ todo-list:
                 item {loop tasks with [task, index]}
                     text.content: task
                     
-                    Button
+                    button
                         event.click: {RemoveTask index}
     >
 
