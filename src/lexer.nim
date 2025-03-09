@@ -214,13 +214,13 @@ parser tokens:
     is-at-end:
         exit tokens.index.kind = "EOF"
     
-    iscurrenttokenkind token-type:
+    is-current-token-kind token-type:
         exit tokens.index.kind = token-type
     
-    isnexttokenkind token-type:
+    is-next-token-kind token-type:
         exit tokens.(index - 1).kind = token-type
     
-    isprevioustokenkind token-type:
+    is-previous-token-kind token-type:
         exit tokens.(index + 1).kind = token-type
     
     statement:
@@ -230,27 +230,27 @@ parser tokens:
         @ exit-statement       |
         @ block
         
-        when iscurrenttokentype "loop"
-            exit loopstatement
-        then iscurrenttokentype "when"
-            exit whenstatement
-        then iscurrenttokentype "exit"
-            exit returnstatement
-        then iscurrenttokentype "indent"
+        when is-current-token-kind "loop"
+            exit loop-statement
+        then iscurrent-tokentype "when"
+            exit when-statement
+        then iscurrent-tokentype "exit"
+            exit return-statement
+        then iscurrent-tokentype "indent"
             exit block
         then
-            exit expressionstatement
+            exit expression-statement
     
     declaration:
         @ function-declaration | 
         @ variable-declaration |
         @ statement
         
-        when iscurrenttokenkind "colon" 
-            when isprevioustokenkind "function-identifier"
-                exit functiondeclaration
-            then isprevioustokenkind "variable-identifier"
-                exit variabledeclaration
+        when is-current-token-kind "colon" 
+            when is-previous-token-kind "function-identifier"
+                exit function-declaration
+            then is-previous-token-kind "variable-identifier"
+                exit variable-declaration
         then
             exit statement
         
