@@ -220,7 +220,7 @@ parser tokens:
     isnexttokenkind token-type:
         exit tokens.(index - 1).kind = token-type
     
-    IsPreviousTokenKind token-type:
+    isprevioustokenkind token-type:
         exit tokens.(index + 1).kind = token-type
     
     Statement:
