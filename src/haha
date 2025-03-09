@@ -58,7 +58,7 @@ parser tokens:
 
 
 
-(string array1) = string array2
+array1 == array2
 
 
 
