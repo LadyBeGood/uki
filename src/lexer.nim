@@ -232,11 +232,11 @@ parser tokens:
         
         when is-current-token-kind "loop"
             exit loop-statement
-        then iscurrent-tokentype "when"
+        then is-current-token-kind "when"
             exit when-statement
-        then iscurrent-tokentype "exit"
+        then is-current-token-kind "exit"
             exit return-statement
-        then iscurrent-tokentype "indent"
+        then is-current-token-kind "indent"
             exit block
         then
             exit expression-statement
