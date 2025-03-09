@@ -72,7 +72,7 @@ calculator:
     display-value: ""
     
     append-to-display value:
-        display-value += value
+        display-value = "|display-value||value|"
     
     clear-display:
         display-value = ""
@@ -182,7 +182,7 @@ render <
 >
 
 
-display-value =| value
+
 
 
 
