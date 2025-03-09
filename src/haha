@@ -92,8 +92,8 @@ todo-list:
                 input.placeholder: "Add a task"
             
             list
-                list.type: "unordered
-                Item {loop tasks with [task, index]}
+                list.type: "unordered"
+                tem {loop tasks with [task, index]}
                     text.content: task
                     
                     Button
