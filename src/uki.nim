@@ -24,3 +24,4 @@ proc main() =
 
 main()
 
+echo "testing acode"
