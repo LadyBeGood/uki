@@ -232,7 +232,7 @@ parser tokens:
         
         when iscurrenttokentype "loop"
             exit loopstatement
-        then IsCurrentTokenType "when"
+        then iscurrenttokentype "when"
             exit whenstatement
         then iscurrenttokentype "exit"
             exit returnstatement
@@ -241,24 +241,26 @@ parser tokens:
         then
             exit expressionstatement
     
-    Declaration:
+    declaration:
         @ function-declaration | 
         @ variable-declaration |
         @ statement
         
         when iscurrenttokenkind "colon" 
             when isprevioustokenkind "function-identifier"
-                exit FunctionDeclaration
+                exit functiondeclaration
             then isprevioustokenkind "variable-identifier"
                 exit variabledeclaration
         then
-            exit Statement
+            exit statement
         
-    loop !IsAtEnd
-        Insert statements, Declaration
+    loop !isatend
+        insert statements, declaration
         index = index + 1
 
     exit statements
+
+
 
 ]#
 
