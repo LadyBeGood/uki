@@ -97,6 +97,7 @@ calculator:
             misc.cursor: "pointer"
             transition: ["box.colour", "0.2s"]
             state.active: {self.box.colour: "#bbb"}
+            event.click: {append-to-display self.text.content}
     >
     
     operator: <
@@ -131,42 +132,30 @@ calculator:
             
             button
                 text.content: "7"
-                event.click: {append-to-display "7"}
             button 
                 text.content: "8"
-                event.click: {append-to-display "8"}
             button 
                 text.content: "9"
-                event.click: {append-to-display "9"}
             button operator
                 text.content: "/"
-                event.click: {append-to-display "/"}
     
             button 
                 text.content: "4"
-                event.click: {append-to-display "4"}
             button 
                 text.content: "5"
-                event.click: {append-to-display "5"}
             button 
                 text.content: "6"
-                event.click: {append-to-display "6"}
             button operator
                 text.content: "*"
-                event.click: {append-to-display "*"}
     
             button 
                 text.content: "1"
-                event.click: {append-to-display "1"}
             button 
                 text.content: "2"
-                event.click: {append-to-display self.text.content}
             button 
                 text.content: "3"
-                event.click: {append-to-display self.text.content}
             button operator
                 text.content: "-"
-                event.click: {append-to-display self.text.content}
     
             button white-text
                 text.content: "C"
@@ -174,14 +163,12 @@ calculator:
                 box.colour: "#dc3545"
             button 
                 text.content: "0"
-                event.click: {append-to-display self.text.content}
             button white-text
                 text.content: "="
                 event.click: {calculate-result}
                 box.colour: "#dc3545"
             button operator
                 text.content: "+"
-                event.click: {append-to-display self.text.content}
     >
 
 
