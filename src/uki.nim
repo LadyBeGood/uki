@@ -25,3 +25,5 @@ proc main() =
 main()
 
 echo "testing acode"
+echo "i think it works fine 😼"
+
