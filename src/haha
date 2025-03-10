@@ -217,10 +217,6 @@ print-prime num-1, num-2
 
 
 
-compiler:
-    lexer:
-    parser:
-    generator:
 
 
 
