@@ -64,16 +64,16 @@ parser tokens:
 
 
 
-calculator: 'element'
-    display-value: "" 'string'
+calculator:
+    display-value: ""
     
-    append-to-display value: 'nothing string'
+    append-to-display value:
         display-value = "|display-value||value|"
     
-    clear-display: 'nothing'
+    clear-display: 
         display-value = ""
     
-    calculate-result: 'nothing'
+    calculate-result:
         when
             display-value = evaluate display-value
         then
@@ -94,12 +94,12 @@ calculator: 'element'
             transition: ["box.colour", "0.2s"]
             state.active: {self.box.colour: "#bbb"}
             event.click: {append-to-display self.text.content}
-    > 'element'
+    >
     
     operator: <
         white-text
             box.colour: colours.blue
-    > 'element'
+    >
     
     exit <
         box.size-x: 320
