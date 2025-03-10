@@ -187,7 +187,7 @@ is-prime num:
         exit wrong
     then num = 2
         exit right
-    then (remainder num, 2) == 0
+    then (remainder num, 2) = 0
         exit wrong
 
     loop 3_(power num, 0.5)_2 with i
