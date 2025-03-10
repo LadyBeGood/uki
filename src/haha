@@ -182,7 +182,7 @@ render <
 
 
 
-is-prime num: 'boolean integer
+is-prime num: 'boolean integer'
     when num !> 1
         exit wrong
     then num = 2
