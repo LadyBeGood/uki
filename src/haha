@@ -182,7 +182,7 @@ render <
 
 
 
-is-prime num:
+is-prime num: '
     when num !> 1
         exit wrong
     then num = 2
