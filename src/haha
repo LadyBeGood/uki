@@ -64,7 +64,7 @@ parser tokens:
 
 
 
-calculator: 'structure(el)'
+calculator: 'element'
     display-value: ""
     
     append-to-display value:
