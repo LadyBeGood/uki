@@ -70,10 +70,10 @@ calculator: 'element'
     append-to-display value: 'nothing string'
         display-value = "|display-value||value|"
     
-    clear-display:
+    clear-display: 'nothing'
         display-value = ""
     
-    calculate-result:
+    calculate-result: 'nothing'
         when
             display-value = evaluate display-value
         then
