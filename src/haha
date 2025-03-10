@@ -82,7 +82,7 @@ calculator:
     
     white-text: <
         text.colour: colours.white
-    > 'element'
+    > 'eleme
     
     button = <
         button
