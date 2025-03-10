@@ -99,7 +99,7 @@ calculator: 'element'
     operator: <
         white-text
             box.colour: colours.blue
-    > 
+    > 'element'
     
     exit <
         box.size-x: 320
