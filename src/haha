@@ -208,7 +208,7 @@ print-prime num-1, num-2: 'nothing integer integer inline'
             write num
 
 
-num-1: number prompt "What's your 1st number"
+num-1: number prompt "What's your 1st number" 'integer"
 num-2: number prompt "What's your 2nd number"
 
 print-prime num-1, num-2
