@@ -64,7 +64,7 @@ parser tokens:
 
 
 
-calculator: 'element'
+calculator: 'objectelement'
     display-value: ""
     
     append-to-display value:
