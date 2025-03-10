@@ -65,7 +65,7 @@ parser tokens:
 
 
 calculator: 'element'
-    display-value: ""
+    display-value: "" 'str
     
     append-to-display value:
         display-value = "|display-value||value|"
