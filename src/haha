@@ -82,7 +82,7 @@ calculator: 'element'
     
     white-text: <
         text.colour: colours.white
-    >
+    > 'element'
     
     button = <
         button
@@ -94,7 +94,7 @@ calculator: 'element'
             transition: ["box.colour", "0.2s"]
             state.active: {self.box.colour: "#bbb"}
             event.click: {append-to-display self.text.content}
-    >
+    > 'element'
     
     operator: <
         white-text
