@@ -156,17 +156,7 @@ proc uki() =
         
     
     
-    const keywords = {
-        "when": When,
-        "then": Then,
-        "loop": Loop,
-        "with": With,
-        "quit": Quit,
-        "skip": Skip,
-        "exit": Exit,
-        "right": Right,
-        "wrong": Wrong,
-    }.toTable
+    
 
 
 proc lexer*(input: string): Tokens =
