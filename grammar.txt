@@ -31,7 +31,8 @@ identifier
 identifier
     lowercase+ (("-" lowercase+) | ("-" digit "-") )*
 
- 
+numeric
+    "-" n
 
 
 
