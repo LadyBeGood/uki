@@ -53,7 +53,7 @@ naMe
 our--name
 1item
 name-1-has- 
-name1-has   // Digits must be inside a `-number-` pattern
+name1-has
 
 
 
