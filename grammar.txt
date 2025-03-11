@@ -6,7 +6,7 @@ uki consists of 3 kinds data-types
     - string 
     - boolean
 - instruction
-    - program inside curly braces or indent and dedent tokens (
+    - program inside curly braces or indent and dedent tokens (basically they are like first class functions)
 - structure
 
 
