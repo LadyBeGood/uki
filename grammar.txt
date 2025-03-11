@@ -29,7 +29,7 @@ identifier
 
 
 identifier
-    lowercase-alphabet (lowercase-alphabet* | )
+    lowercase-alphabet (lowercase-alphabet* | "-" lowercase-alphabet|)
 
 
 
