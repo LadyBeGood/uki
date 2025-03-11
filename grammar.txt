@@ -4,8 +4,8 @@ program
     statement*
 
 statement  
-    declaration  
-     
+    container-declaration  
+    container-usage  
     loop-statement  
     when-statement  
     expression  
