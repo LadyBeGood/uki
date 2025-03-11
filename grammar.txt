@@ -21,7 +21,7 @@ container-retrieval
     identifier arguments?
 
 parameters
-    
+    identifier ("," identifier)* 
 
 arguments  
     expression ("," expression)*  
