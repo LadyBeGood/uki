@@ -35,7 +35,7 @@ words
     lowercase+ ("-" lowercase+)*
 
 numeric
-    "-" digit "-" lowercase+
+    "-" digit "-" words
 
 
 
