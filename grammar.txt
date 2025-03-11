@@ -32,7 +32,7 @@ identifier
     lowercase+ (("-" lowercase+) | numeric* )*
 
 words
-    lowercase+ ("-" lowercase+)*
+    lowercase+ ("-" lowercase+ | numeric)*
 
 numeric
     "-" digit "-" words
