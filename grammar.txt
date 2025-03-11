@@ -30,9 +30,13 @@ identifier
 
 
 
-<variable> ::= <lower> | <lower> <rest>
+variable
+    lower
+    lower rest
 
-<rest> ::= "-" <segment> | <digit> "-" <segment>
+rest
+    "-" segment
+    digit "-" segment>
 <segment> ::= <lower> | <lower> <rest>
 
 <lower> ::= "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" |
