@@ -10,7 +10,7 @@ statement
 
 declaration  
     parameter-declaration
-    identifier ":" data-structure
+    normal-declaration
 
 
 
