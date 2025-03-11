@@ -41,7 +41,7 @@ name
 our-name
 item-1
 name-1-has
-name-1--has
+name-1-2-has
 
 Name
 naMe
