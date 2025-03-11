@@ -3,7 +3,7 @@
 uki consists of 3 kinds data-types
 - values
 - instruction
-- a
+- structure 
 
 
 
