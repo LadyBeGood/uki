@@ -1,11 +1,11 @@
 
 
 basic structure is kind of like this
-- programstatements
+- program ::= statements
 
 - statement
     - declaration (identifier contain value)
-    -
+    - 
 
 uki consists of 3 types of type of data
 - values
