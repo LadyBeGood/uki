@@ -4,10 +4,6 @@ program
     declaration
 
 declaration
-    function-declaration | 
-    variable-declaration |
-
-function-declaration
     function-identifier ":" header-end block?
 
 variable-declaration
