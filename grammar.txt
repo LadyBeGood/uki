@@ -2,10 +2,15 @@
 
 uki consists of 3 kinds data-types
 - values
+    - number 
+    - string 
+    - boolean
 - instruction
+    - 
 - structure
 
 
+ 
 
 
 
