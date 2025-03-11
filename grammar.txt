@@ -1,61 +1,120 @@
+program  
+    statement*
 
-example syntax 
-```
-is-prime num: 
-    when num !> 1
-        exit wrong
-    then num = 2
-        exit right
-    then (remainder num, 2) = 0
-        exit wrong
+statement  
+    declaration  
+    function-call  
+    loop-statement  
+    when-statement  
+    expression  
 
-    loop 3_(power num, 0.5)_2 with i
-        when (remainder num, i) = 0
-            exit wrong
-    
-    exit right
-
-
-print-prime num-1, num-2: 
-    write "Prime numbers in range [|num-1|, |num2|]:"
-    loop num-1_num-2 with num
-        when is-prime num
-            write num
-
-
-num-1: number prompt "What's your 1st number" 
-num-2: number prompt "What's your 2nd number"
-
-print-prime num-1, num-2
-```
+declaration  
+    parameter-declaration
+    identifier ":" data-structure
 
 
 
-basic structure is kind of like this
-- program ::= statements
+function-call  
+    identifier arguments?  
 
-- statement
-    - declaration (identifier contain value)
-    - loop-statement (like standard for loop)
-    - when-statement (like if, else, else if)
-    - values (just lying around)
+arguments  
+    expression ("," expression)*  
 
+loop-statement  
+    "loop" loop-range loop-variable? instruction-block  
 
-uki is white space sensitive like python or nim and doesn't require ";"s 
-it also doesn't require ":" at the end of "header" like in python. ":" in uki is the "assignment operator" (not to be confused with "=" reassignment operator)
+loop-range  
+    number  
+    number "_" number  
+    number "_" number "_" number  
+    identifier  (* array, object, string iteration *)  
 
-uki consists of 3 types of type of data
-- values
-    - number 
-    - string 
-    - boolean
-- instruction
-    - program inside curly braces or indent and dedent tokens (basically they are like first class functions)
-- structure
-    - object 
-    - array 
+loop-variable  
+    "with" identifier  
+    "with" "[" identifier ("," identifier)* "]"  
 
- 
+when-statement  
+    "when" expression instruction-block  
+    "then" expression? instruction-block  
+
+expression  
+    value  
+    identifier  
+    math-operation  
+    function-call  
+    boolean-expression  
+    interpolation  
+
+value  
+    number  
+    string  
+    boolean  
+
+boolean  
+    "right" | "wrong"  
+
+string  
+    '"' characters '"'  
+
+number  
+    digit+  
+
+data-structure  
+    array | object  
+
+array  
+    "[" expression-list? "]"  
+
+object  
+    "[" key-value-pair ("," key-value-pair)* "]"  
+
+key-value-pair  
+    string ":" expression  
+
+instruction  
+    "{" statement* "}"  
+    indented-statements  
+
+instruction-block  
+    indented-statements  
+
+math-operation  
+    expression ("+" | "-" | "*" | "/") expression  
+    "remainder" expression "," expression  
+    "power" expression "," expression  
+
+boolean-expression  
+    expression comparison-operator expression  
+
+comparison-operator  
+    "=" | "!>" | "!<"  
+
+logical-expression  
+    expression ("&" | "?" | "!") expression  
+
+interpolation  
+    '"' characters* "|" expression "|" characters* '"'  
+
+identifier  
+    lowercase-word ("-" lowercase-word)*  
+
+lowercase-word  
+    lowercase-letter+  
+
+lowercase-letter  
+    "a" | "b" | "c" | ... | "z"  
+
+function-definition  
+    identifier parameters? ":" instruction-block  
+
+parameters  
+    identifier ("," identifier)*  
+
+function-call  
+    identifier arguments?  
+
+indented-statements  
+    indent statement* dedent
 
 
 
