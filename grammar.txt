@@ -1,11 +1,9 @@
 
 
 program
+    statements
 
 
-
-
-statements
     declaration
 
 declaration
