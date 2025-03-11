@@ -1,9 +1,7 @@
 
 
 program
-    statements
-
-
+    state
     declaration
 
 declaration
