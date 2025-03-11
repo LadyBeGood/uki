@@ -15,8 +15,7 @@ container-statement
     container-retrieval
 
 container-declaration 
-    identifier ":" expression
-    n
+    identifier arguments?":" expression
 
 container-
 
