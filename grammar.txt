@@ -4,11 +4,10 @@ program
     statement*
 
 statement  
-    container-declaration  
-    container-accessing
+    container-statement
+    expression-statement 
     loop-statement  
     when-statement  
-    expression  
 
 
 declaration  
