@@ -29,7 +29,7 @@ identifier
 
 
 identifier
-    lowercase+ (("-" lowercase+) | ("-" digit "-") )*
+    lowercase+ (("-" lowercase+) | ("-" digit "-" )*
 
 numeric
     "-" digit "-"
