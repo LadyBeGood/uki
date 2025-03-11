@@ -42,7 +42,7 @@ basic structure is kind of like this
 
 
 uki is white space sensitive like python or nim and doesn't require ";"s 
-it also doesn't require ":" at the end of "header" like in python. ":" in uki is a 
+it also doesn't require ":" at the end of "header" like in python. ":" in uki is the "assignment operator" (not to be confused with "=" reassigme
 
 uki consists of 3 types of type of data
 - values
