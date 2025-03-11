@@ -28,18 +28,10 @@ identifier
     [a-z] ([a-z | 0-9 | "-"] [a-z | 0-9])*
 
 
+identifier
+    lowercase-alphabet (lowercase-alphabet* | )
 
 
-variable
-    lower |
-    lower rest
-
-rest
-    "-" (segment | digit "-" segment)
-    
-segment
-    lower |
-    lower rest
 
 
 
@@ -54,6 +46,9 @@ our--name
 1item
 name-1-has- 
 name1-has
+
+
+
 
 
 
