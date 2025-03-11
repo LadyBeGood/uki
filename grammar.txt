@@ -6,7 +6,6 @@ program
 declaration
     function-declaration | 
     variable-declaration |
-     
 
 function-declaration
     function-identifier ":" header-end block?
