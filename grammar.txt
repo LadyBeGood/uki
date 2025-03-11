@@ -6,8 +6,6 @@ program
 declaration
     function-identifier ":" header-end block?
 
-variable-declaration
-    variable-identifier ":" expression
 
 statement
     expression-statement            |
