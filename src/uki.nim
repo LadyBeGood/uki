@@ -356,9 +356,7 @@ proc uki() =
 
 
 
-
-    
-    proc compiler*(input: string): string =
+    proc compiler(input: string): string =
         let tokens: Tokens = lexer(input)
         let ast: Statements = parser(tokens)
         var str:  string = ""
@@ -374,17 +372,15 @@ proc uki() =
     let inputFile = paramStr(1)
     let outputFile = "e.uki"
 
-    # Read the input file
     let inputText = readFile(inputFile)
     if inputText.strip(chars = {' ', '\t', '\n'}, leading = true, trailing = false)  == "":
         echo "Empty file"
         quit(1)
 
-    # Process the input through the lexer
     let outputText = compiler(inputText)
-
-    # Write the output to the output file
     writeFile(outputFile, outputText)
 
 
 uki()
+
+
