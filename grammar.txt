@@ -27,17 +27,8 @@ arguments
     expression ("," expression)*  
 
 loop-statement  
-    "loop"
+    "loop" block
 
-loop-range  
-    number  
-    number "_" number  
-    number "_" number "_" number  
-    identifier  (* array, object, string iteration *)  
-
-loop-variable  
-    "with" identifier  
-    "with" "[" identifier ("," identifier)* "]"  
 
 when-statement  
     "when" expression instruction-block  
