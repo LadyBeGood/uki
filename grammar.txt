@@ -4,7 +4,7 @@ program
     declaration
 
 declaration
-    function-identifier ":" header-end block?
+    identifier ":" header-end block?
 
 
 statement
