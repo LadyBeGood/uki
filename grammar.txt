@@ -33,7 +33,7 @@ identifier
     lowercase+ ("-" lowercase+ | numeric*)?
 
 numeric
-    "-" digit (numeric | words)?
+    "-" digit (numeric | identifier)?
 
 
 
