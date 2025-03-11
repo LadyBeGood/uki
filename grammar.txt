@@ -35,8 +35,7 @@ variable
     lower rest
 
 rest
-    "-" segment |
-    digit "-" segment
+    "-" (segment | digit "-" segment)
     
 segment
     lower |
