@@ -3,9 +3,9 @@
 basic structure is kind of like this
 - program consists of statements
 - statement
-- de
+- declaration (identifier contain
 
-uki consists of 3 kinds data-types
+uki consists of 3 types of type of data
 - values
     - number 
     - string 
