@@ -10,9 +10,8 @@ statement
     when-statement  
 
 
-declaration  
-    parameter-declaration
-    normal-declaration
+con  
+    
 
 
 
