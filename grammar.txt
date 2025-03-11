@@ -33,7 +33,7 @@ identifier
 
 
 numeric
-    "-" digit "-" 
+    "-" digit "-" lowercase+
 
 
 
