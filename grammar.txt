@@ -1,9 +1,11 @@
 
 
 basic structure is kind of like this
-- program consists of statements
+- programstatements
+
 - statement
-- declaration (identifier contain
+    - declaration (identifier contain value)
+    -
 
 uki consists of 3 types of type of data
 - values
