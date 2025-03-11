@@ -1,6 +1,5 @@
 import os, strutils, json, options, tables, macros
 import lists, sequtils, strformat, std/strutils
-   
 
 
 proc uki() =
