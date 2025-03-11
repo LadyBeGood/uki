@@ -5,7 +5,7 @@ basic structure is kind of like this
 
 - statement
     - declaration (identifier contain value)
-    - loop-statement (
+    - loop-statement (like js
     - when-statement
 
 uki consists of 3 types of type of data
