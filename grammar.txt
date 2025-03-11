@@ -1,13 +1,12 @@
 
 
 program
-    state
     declaration
 
 declaration
     function-declaration | 
     variable-declaration |
-    statement  
+     
 
 function-declaration
     function-identifier ":" header-end block?
