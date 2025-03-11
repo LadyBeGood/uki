@@ -1,5 +1,10 @@
 
 
+basic structure is kind of like this
+- program consists of statements
+- statement
+- de
+
 uki consists of 3 kinds data-types
 - values
     - number 
@@ -8,7 +13,8 @@ uki consists of 3 kinds data-types
 - instruction
     - program inside curly braces or indent and dedent tokens (basically they are like first class functions)
 - structure
-
+    - object 
+    - array 
 
  
 
