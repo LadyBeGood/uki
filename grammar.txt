@@ -27,7 +27,7 @@ arguments
     expression ("," expression)*  
 
 loop-statement  
-    "loop" loop-range loop-variable? instruction-block  
+    "loop"
 
 loop-range  
     number  
