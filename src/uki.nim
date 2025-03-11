@@ -1,4 +1,7 @@
 import os, strutils, json, options, tables, macros
+import lists, sequtils, strformat, std/strutils
+   
+
 
 proc uki() =
     type 
@@ -353,9 +356,6 @@ proc uki() =
         return tokens
         
 
-    import lists, sequtils, strformat, std/strutils
-   
-    
     
   
     
