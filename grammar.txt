@@ -5,8 +5,8 @@ basic structure is kind of like this
 
 - statement
     - declaration (identifier contain value)
-    - loop-statement (like js
-    - when-statement
+    - loop-statement (like sfagndtandard for loop)
+    - when-statement (like id
 
 uki consists of 3 types of type of data
 - values
