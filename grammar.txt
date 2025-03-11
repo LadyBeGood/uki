@@ -25,7 +25,7 @@ arguments
 
 
 identifier
-    [a-z | A-Z] [a-z | A-Z | 0-9 | "-"] 
+    [a-z] [a-z |  | 0-9 | "-"] 
 
 
 
