@@ -42,7 +42,7 @@ basic structure is kind of like this
 
 
 uki is white space sensitive like python or nim and doesn't require ";"s 
-it also doesn't requ
+it also doesn't require ":" at the end of 
 
 uki consists of 3 types of type of data
 - values
