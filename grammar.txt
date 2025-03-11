@@ -1,9 +1,11 @@
+
+
 program  
     statement*
 
 statement  
     declaration  
-    function-call  
+     
     loop-statement  
     when-statement  
     expression  
