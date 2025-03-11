@@ -4,7 +4,7 @@ program
     declaration
 
 declaration
-    identifier ":" header-end block?
+    identifier ":" value
 
 
 statement
