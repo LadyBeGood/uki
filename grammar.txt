@@ -6,7 +6,7 @@ basic structure is kind of like this
 - statement
     - declaration (identifier contain value)
     - loop-statement (like sfagndtandard for loop)
-    - when-statement (like id
+    - when-statement (like if else else if)
 
 uki consists of 3 types of type of data
 - values
