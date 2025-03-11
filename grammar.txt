@@ -28,11 +28,9 @@ identifier
     [a-z] ([a-z | 0-9 | "-"] [a-z | 0-9])*
 
 
-identifier
-    lowercase+ (("-" lowercase+) | numeric* )*
 
-words
-    lowercase+ ("-" lowercase+ | numeric*)
+identifier
+    lowercase+ ("-" lowercase+ | numeric*)?
 
 numeric
     "-" digit "-" words
