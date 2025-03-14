@@ -3,10 +3,10 @@ import os, strutils, json, options, tables, macros, lists, sequtils, strformat
 
 proc uki() =
     type 
-        Object* = ref object of RootObj
+        Object = ref object of RootObj
     
-        BooleanObject* = ref object of Object
-            data*: bool
+        BooleanObject = ref object of Object
+            data: bool
         
         NumberObject* = ref object of Object
             data*: float
@@ -103,55 +103,55 @@ proc uki() =
         LiteralExpression* = ref object of Expression
             value*: Object
     
-        UnaryExpression* = ref object of Expression
-            operator*: Token
-            right*: Expression
+        UnaryExpression = ref object of Expression
+            operator: Token
+            right: Expression
         
     
         # Statement
-        Statement* = ref object of RootObj
-        Statements* = seq[Statement]
+        Statement = ref object of RootObj
+        Statements = seq[Statement]
         
         
         
-        VariableDeclarationStatement* = ref object of Statement
-            variableIdentifier*: string
-            value*: Expression
+        VariableDeclarationStatement = ref object of Statement
+            variableIdentifier: string
+            value: Expression
         
-        VariableReassignmentStatement* = ref object of Statement
-            variableIdentifier*: string
-            value*: Expression
+        VariableReassignmentStatement = ref object of Statement
+            variableIdentifier: string
+            value: Expression
         
-        FunctionDeclarationStatement* = ref object of Statement
-            functionIdentifier*: string
-            parameters*: FunctionParameters
-            body*: Statement
+        FunctionDeclarationStatement = ref object of Statement
+            functionIdentifier: string
+            parameters: FunctionParameters
+            body: Statement
         
-        FunctionReassignmentStatement* = ref object of Statement
-            functionIdentifier*: string
-            body*: Statement
+        FunctionReassignmentStatement = ref object of Statement
+            functionIdentifier: string
+            body: Statement
         
-        ExpressionStatement* = ref object of Statement
-            expression*: Expression
+        ExpressionStatement = ref object of Statement
+            expression: Expression
         
-        LoopStatement* = ref object of Statement
-            condition*: Expressions
-            placeholder*: Statement
+        LoopStatement = ref object of Statement
+            condition: Expressions
+            placeholder: Statement
         
-        WhenStatement* = ref object of Statement
-            condition*: Expression
-            placeholder*: Statement
-            otherwise*: Statement
+        WhenStatement = ref object of Statement
+            condition: Expression
+            placeholder: Statement
+            otherwise: Statement
         
-        ControlStatement* = ref object of Statement
-            kind*: TokenKind
-            value*: Expression
+        ControlStatement = ref object of Statement
+            kind: TokenKind
+            value: Expression
         
-        EmptyControlStatement* = ref object of Statement
-            kind*: TokenKind
+        EmptyControlStatement = ref object of Statement
+            kind: TokenKind
         
-        BlockStatement* = ref object of Statement
-            statements*: Statements
+        BlockStatement = ref object of Statement
+            statements: Statements
         
 
 
