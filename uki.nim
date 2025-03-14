@@ -8,8 +8,8 @@ proc uki() =
         BooleanObject = ref object of Object
             data: bool
         
-        NumberObject* = ref object of Object
-            data*: float
+        NumberObject = ref object of Object
+            data: float
         
         StringObject = ref object of Object
             data: string
