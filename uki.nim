@@ -11,10 +11,10 @@ proc uki() =
         NumberObject* = ref object of Object
             data*: float
         
-        StringObject* = ref object of Object
-            data*: string
+        StringObject = ref object of Object
+            data: string
         
-        TokenKind* = enum
+        TokenKind = enum
             LeftRoundBracket,    # (
             RightRoundBracket,   # )
             LeftCurlyBracket,    # {
@@ -63,45 +63,45 @@ proc uki() =
             Dedent,
             EOF           # End-of-file
     
-        Token* = object
-            kind*: TokenKind
-            lexeme*: string
-            line*: int
+        Token = object
+            kind: TokenKind
+            lexeme: string
+            line: int
         
-        Tokens* = seq[Token]
+        Tokens = seq[Token]
       
         
-        FunctionParameter* = ref object of ExpressionStatement
-            name*: string
-            default*: Expression
+        FunctionParameter = ref object of ExpressionStatement
+            name: string
+            default: Expression
     
-        FunctionArgument* = ref object of ExpressionStatement
-            value*: Expression  
+        FunctionArgument = ref object of ExpressionStatement
+            value: Expression  
         
-        FunctionParameters* = seq[FunctionParameter]
-        FunctionArguments* = seq[FunctionArgument]
+        FunctionParameters = seq[FunctionParameter]
+        FunctionArguments = seq[FunctionArgument]
        
         # Expressions
-        Expression* = ref object of RootObj
-        Expressions* = seq[Expression]
+        Expression = ref object of RootObj
+        Expressions = seq[Expression]
     
-        BinaryExpression* = ref object of Expression
-            left*: Expression
-            operator*: Token
-            right*: Expression
+        BinaryExpression = ref object of Expression
+            left: Expression
+            operator: Token
+            right: Expression
     
-        FunctionExpression* = ref object of Expression
-            functionIdentifier*: string
-            arguments*: FunctionArguments
+        FunctionExpression = ref object of Expression
+            functionIdentifier: string
+            arguments: FunctionArguments
         
-        VariableExpression* = ref object of Expression
-            variableIdentifier*: string
+        VariableExpression = ref object of Expression
+            variableIdentifier: string
         
-        GroupingExpression* = ref object of Expression
-            Expression*: Expression
+        GroupingExpression = ref object of Expression
+            Expression: Expression
     
-        LiteralExpression* = ref object of Expression
-            value*: Object
+        LiteralExpression = ref object of Expression
+            value: Object
     
         UnaryExpression = ref object of Expression
             operator: Token
