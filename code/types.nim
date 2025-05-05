@@ -1,85 +1,98 @@
 type
     TokenKind* {.pure.} = enum
-        Illegal,
-        EndOfFile,
+        Illegal
+        EndOfFile
     
         # Literals  
-        NumericLiteral,  
-        UninterpolatedStringLiteral,  
-        RegularExpressionLiteral,  
+        NumericLiteral  
+        UninterpolatedStringLiteral  
+        RegularExpressionLiteral  
           
         # Pseudo-literals  
-        InterpolatedStringHeadLiteral,  
-        InterpolatedStringMiddleLiteral,  
-        InterpolatedStringTailLiteral,  
+        InterpolatedStringHeadLiteral  
+        InterpolatedStringMiddleLiteral  
+        InterpolatedStringTailLiteral  
           
         # Identifier  
-        Identifier,  
+        Identifier  
       
         # Punctuation  
-        LeftRoundBracket,   
-        RightRoundBracket,   
-        LeftCurlyBracket,   
-        RightCurlyBracket,  
-        LeftSquareBracket,   
-        RightSquareBracket,  
-        Dot,  
-        Comma,  
-        Exclamation,  
-        Ampersand,  
-        Question,  
-        Colon,  
-        Equal,  
-        LessThan,  
-        MoreThan,  
-        ExclamationEqual,  
-        ExclamationLessThan,  
-        ExclamationMoreThan,  
-        Plus,  
-        Minus,  
-        Asterisk,  
-        Slash,  
-        Bar,  
-        Tilde,  
-        Hash,  
-        Underscore,  
-        UnderscoreLessThan,  
-        NewLine,  
-        Dollar,  
+        LeftRoundBracket   
+        RightRoundBracket   
+        LeftCurlyBracket   
+        RightCurlyBracket  
+        LeftSquareBracket   
+        RightSquareBracket  
+        Dot  
+        Comma  
+        Exclamation  
+        Ampersand  
+        Question  
+        Colon  
+        Equal  
+        LessThan  
+        MoreThan  
+        ExclamationEqual  
+        ExclamationLessThan  
+        ExclamationMoreThan  
+        Plus  
+        Minus  
+        Asterisk  
+        Slash  
+        Bar  
+        Tilde  
+        Hash  
+        Underscore  
+        UnderscoreLessThan  
+        NewLine  
+        Dollar  
           
       
         # Reserved words  
-        WhenKeyword,  
-        ThenKeyword,  
-        PickKeyword,  
-        CaseKeyword,  
-        TryKeyword,  
-        FixKeyword,  
-        LoopKeyword,  
-        WithKeyword,  
-        ImportKeyword,  
-        ExportKeyword,  
-        RightKeyword,  
+        WhenKeyword  
+        ThenKeyword  
+        TryKeyword  
+        FixKeyword  
+        LoopKeyword  
+        WithKeyword  
+        ImportKeyword  
+        ExportKeyword  
+        RightKeyword  
         WrongKeyword  
       
         # Spacing  
         Indent  
         Dedent  
     
+    DiagnosticKind* {.pure.} = enum
+        Lexer
+        Parser
+        Validator
+
     Token* = object  
-        tokenKind*: TokenKind  
+        tokenKind*: TokenKind
         lexeme*: string  
-        line*: int  
+        line*: int 
     
     Tokens* = seq[Token]
     
-    TokenStream* = object
+    Diagnostic* = object
+        diagnosticKind*: DiagnosticKind
+        errorMessage*: string
+        line*: int
     
+    Diagnostics* = seq[Diagnostic]
+    
+    LexerOutput* = object
+        diagnostics*: Diagnostics
+        tokens*: Tokens
+ 
+   
+#[
     Statment* = object
     
     Statments* = seq[Statment]
     
-
 
 
     Object = ref object of RootObj
@@ -172,4 +185,5 @@ type
     BlockStatement = ref object of Statement
         statements: Statements
 
+]#
 
