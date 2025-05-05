@@ -1,25 +1,6 @@
-import macros
-import types, tables
+import tables
+import types, ../utilities/debugging
 
-macro shout*(args: varargs[untyped]): untyped =
-    result = newStmtList()
-    for arg in args:
-        result.add(quote do:
-            echo `arg`.astToStr, " = ", `arg`
-        )
-
-const keywords = {
-    "try": TokenKind.TryKeyword,
-    "fix": TokenKind.FixKeyword,
-    "when": TokenKind.WhenKeyword,
-    "then": TokenKind.ThenKeyword,
-    "loop": TokenKind.LoopKeyword,
-    "with": TokenKind.WithKeyword,
-    "right": TokenKind.RightKeyword,
-    "wrong": TokenKind.WrongKeyword,
-    "import": TokenKind.ImportKeyword,
-    "export": TokenKind.ExportKeyword
-}.toTable
 
 proc lexer*(input: string): LexerOutput =
     var index: int
@@ -35,84 +16,87 @@ proc lexer*(input: string): LexerOutput =
         add diagnostics, Diagnostic(diagnosticKind: DiagnosticKind.Lexer, errorMessage: errorMessage, line: line)
     
     proc isAtEnd(): bool =
-        return index == input.len
-    
-    proc currentCharacter(): char =
-        return input[index]
-    
-    proc isCurrentCharacter(expected: char): bool =
-        return 
-            if not isAtEnd() and input[index] == expected:
-                true
-            else:
-                false
-    
-    
-    proc isNextCharacter(expected: char): bool =
-        return
-            if (index + 1 < input.len) and input[index + 1] == expected:
-                true
-            else:
-                false
-    
+        return index >= input.len
 
     proc isDigit(character: char): bool =
         return character in {'0' .. '9'}
 
     proc isAlphabet(character: char): bool =
-        return character in {'A'..'Z', '-', 'a'..'z'}
-
+        return character in {'a'..'z'}
+    
     proc isAlphaNumeric(character: char): bool =
-        isAlphabet(character) or isDigit(character)
+        return isAlphabet(character) or isDigit(character) or character == '-'
     
     
     proc string() =
+        # Skip the opening quote
+        index.inc()  
         var accumulate = ""
-        index.inc()
-        while not isCurrentCharacter('"'):
-            if index >= input.len:
-              addDiagnostic("Unterminated string literal")
-              return
-            accumulate &= $currentCharacter()
-            if currentCharacter() == '\n':
+        while true:
+            if isAtEnd():
+                addDiagnostic("Unterminated string literal")
+                return
+    
+            if input[index] == '"':
+                break
+            elif input[index] == '\n':
                 line.inc()
+    
+            accumulate &= $input[index]
             index.inc()
-        index.inc()
+    
+        # Skip the closing quote
+        index.inc()  
         addToken(TokenKind.UninterpolatedStringLiteral, accumulate)
-
+    
     proc identifier() =
         var accumulate = ""
-        while not isAtEnd() and isAlphaNumeric(currentCharacter()):
-            accumulate &= $currentCharacter()
+        while not isAtEnd() and isAlphaNumeric(input[index]):
+            accumulate &= $input[index]
+        
             index.inc()
+        
+        const keywords = {
+            "try": TokenKind.TryKeyword,
+            "fix": TokenKind.FixKeyword,
+            "when": TokenKind.WhenKeyword,
+            "then": TokenKind.ThenKeyword,
+            "loop": TokenKind.LoopKeyword,
+            "with": TokenKind.WithKeyword,
+            "right": TokenKind.RightKeyword,
+            "wrong": TokenKind.WrongKeyword,
+            "import": TokenKind.ImportKeyword,
+            "export": TokenKind.ExportKeyword
+        }.toTable
         
         # Check if the identifier is a keyword
         if keywords.hasKey(accumulate):
             addToken(keywords[accumulate], accumulate)  
         else:
             addToken(TokenKind.Identifier, accumulate) 
-            
 
-    proc number() =
-        var accumulate = ""
-        while not isAtEnd() and isDigit(currentCharacter()):
-            accumulate &= currentCharacter()
+
+    proc number(isNegative: bool = false) =
+        var accumulate = if isNegative: "-" else: ""
+        while not isAtEnd() and isDigit(input[index]):
+            accumulate &= input[index]
             index.inc()
 
         addToken(TokenKind.NumericLiteral, accumulate)
     
-    
     proc handleIndentation() =
         var spaceCount = 0
     
-        while not isAtEnd() and currentCharacter() == ' ':
+        # Count leading spaces
+        while not isAtEnd() and input[index] == ' ':
             spaceCount.inc()
             index.inc()
     
-        if isAtEnd() or currentCharacter() == '\n':
-            # Empty or whitespace-only line, ignore indentation
+        # Skip line if it's empty or contains only spaces
+        if isAtEnd() or input[index] == '\n':
             return
     
+        # Indentation must be a multiple of 4
         if spaceCount mod 4 != 0:
             addDiagnostic("Indentation must be a multiple of 4 spaces")
             return
@@ -121,16 +105,24 @@ proc lexer*(input: string): LexerOutput =
         let currentIndentLevel = indentStack[^1]
     
         if indentLevel > currentIndentLevel:
+            # Only allow increasing by one level at a time
             if indentLevel != currentIndentLevel + 1:
-                addDiagnostic("Unexpected indent")
+                addDiagnostic("Unexpected indent level: expected " &
+                    $(currentIndentLevel + 1) & " but got " & $indentLevel)
                 return
             indentStack.add(indentLevel)
             addToken(TokenKind.Indent)
+    
         elif indentLevel < currentIndentLevel:
+            # Dedent to known indentation level
             while indentStack.len > 0 and indentStack[^1] > indentLevel:
                 indentStack.setLen(indentStack.len - 1)
                 addToken(TokenKind.Dedent)
-        
+    
+            if indentStack.len == 0 or indentStack[^1] != indentLevel:
+                addDiagnostic("Inconsistent dedent: expected indent level " &
+                    $indentStack[^1] & " but got " & $indentLevel)
+
     while not isAtEnd():
         let character = input[index]
         
@@ -163,11 +155,19 @@ proc lexer*(input: string): LexerOutput =
             addToken(TokenKind.Colon, $character)
             index.inc()
         of '-':
-            addToken(TokenKind.Minus, $character)
-            index.inc()
+            if index + 1 < input.len and isDigit(input[index + 1]):
+                index.inc()
+                number(true)
+            else:
+                addToken(TokenKind.Minus, $character)
+                index.inc()
         of '+':
-            addToken(TokenKind.Plus, $character)
-            index.inc()
+            if index + 1 < input.len and isDigit(input[index + 1]):
+                index.inc()
+                number()
+            else:
+                addToken(TokenKind.Plus, $character)
+                index.inc()
         of '*':
             addToken(TokenKind.Asterisk, $character)
             index.inc()
@@ -197,10 +197,10 @@ proc lexer*(input: string): LexerOutput =
             index.inc()
         of '#':
             # Ignore single line comment
-            while not isAtEnd() and not isCurrentCharacter('\n'):
+            while not isAtEnd() and not (input[index] == '\n'):
                 index.inc()
         of '_':
-            if isNextCharacter('<'):
+            if index + 1 < input.len and input[index + 1] == '<':
                 index.inc(2)
                 addToken(TokenKind.UnderscoreLessThan, "_<")
             else:
@@ -213,15 +213,16 @@ proc lexer*(input: string): LexerOutput =
         of ' ', '\\':
             index.inc()
         of '!':
-            if isNextCharacter('='):
-                addToken(TokenKind.ExclamationEqual, "!=")
-                index.inc(2)
-            elif isNextCharacter('>'):
-                addToken(TokenKind.ExclamationMoreThan, "!>")
-                index.inc(2)
-            elif isNextCharacter('<'): 
-                addToken(TokenKind.ExclamationLessThan, "!<")
-                index.inc(2)
+            if index + 1 < input.len:
+                if input[index] == '=':
+                    addToken(TokenKind.ExclamationEqual, "!=")
+                    index.inc(2)
+                elif input[index] == '>':
+                    addToken(TokenKind.ExclamationMoreThan, "!>")
+                    index.inc(2)
+                elif input[index] == '<': 
+                    addToken(TokenKind.ExclamationLessThan, "!<")
+                    index.inc(2)
             else: 
                 addToken(TokenKind.Exclamation, $character)
                 index.inc()
@@ -234,9 +235,13 @@ proc lexer*(input: string): LexerOutput =
                 identifier()
             else:
                 addDiagnostic("Unexpected character: `" & $character & "`")
-                break
+                index.inc()
 
-
+    while indentStack.len > 1:  
+        # Preserve the base level 0
+        indentStack.setLen(indentStack.len - 1)
+        addToken(TokenKind.Dedent)
+    
     addToken(TokenKind.EndOfFile)
     
     return LexerOutput(diagnostics: diagnostics, tokens: tokens)
@@ -246,10 +251,7 @@ proc lexer*(input: string): LexerOutput =
 when isMainModule:
     import os, json
     
-    let input: string = """
-is-prime number:
-    exit right
-"""
+    let input: string = ""
 
     let tokens = lexer(input)
     let formatted = pretty(%tokens, indent = 4)
