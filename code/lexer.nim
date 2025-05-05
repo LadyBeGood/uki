@@ -9,28 +9,30 @@ macro shout*(args: varargs[untyped]): untyped =
         )
 
 const keywords = {
-    "try": TryKeyword,
-    "fix": FixKeyword,
-    "when": WhenKeyword,
-    "then": ThenKeyword,
-    "loop": LoopKeyword,
-    "with": WithKeyword,
-    "pick": PickKeyword,
-    "case": CaseKeyword,
-    "right": RightKeyword,
-    "wrong": WrongKeyword,
-    "import": ImportKeyword,
-    "export": ExportKeyword,
+    "try": TokenKind.TryKeyword,
+    "fix": TokenKind.FixKeyword,
+    "when": TokenKind.WhenKeyword,
+    "then": TokenKind.ThenKeyword,
+    "loop": TokenKind.LoopKeyword,
+    "with": TokenKind.WithKeyword,
+    "right": TokenKind.RightKeyword,
+    "wrong": TokenKind.WrongKeyword,
+    "import": TokenKind.ImportKeyword,
+    "export": TokenKind.ExportKeyword
 }.toTable
 
-proc lexer*(input: string): Tokens =
+proc lexer*(input: string): LexerOutput =
     var index: int
     var tokens: Tokens
+    var diagnostics: Diagnostics
     var line: int = 1
     var indentStack = @[0]
 
-    proc addToken(lexeme: string = "", tokenKind: TokenKind) =
+    proc addToken(tokenKind: TokenKind, lexeme: string = "") =
         add tokens, Token(tokenKind: tokenKind, lexeme: lexeme, line: line)
+    
+    proc addDiagnostic(errorMessage: string) =
+        add diagnostics, Diagnostic(diagnosticKind: DiagnosticKind.Lexer, errorMessage: errorMessage, line: line)
     
     proc isAtEnd(): bool =
         return index == input.len
@@ -69,14 +71,14 @@ proc lexer*(input: string): Tokens =
         index.inc()
         while not isCurrentCharacter('"'):
             if index >= input.len:
-                addToken("Unterminated string literal", TokenKind.Illegal)
-                return
+              addDiagnostic("Unterminated string literal")
+              return
             accumulate &= $currentCharacter()
             if currentCharacter() == '\n':
                 line.inc()
             index.inc()
         index.inc()
-        addToken(accumulate, TokenKind.UninterpolatedStringLiteral)
+        addToken(TokenKind.UninterpolatedStringLiteral, accumulate)
 
     proc identifier() =
         var accumulate = ""
@@ -86,9 +88,9 @@ proc lexer*(input: string): Tokens =
         
         # Check if the identifier is a keyword
         if keywords.hasKey(accumulate):
-            addToken(accumulate, keywords[accumulate])  
+            addToken(keywords[accumulate], accumulate)  
         else:
-            addToken(accumulate, Identifier) 
+            addToken(TokenKind.Identifier, accumulate) 
             
 
     proc number() =
@@ -97,7 +99,7 @@ proc lexer*(input: string): Tokens =
             accumulate &= currentCharacter()
             index.inc()
 
-        addToken(accumulate, NumericLiteral)
+        addToken(TokenKind.NumericLiteral, accumulate)
     
     
     proc handleIndentation() =
@@ -112,116 +114,116 @@ proc lexer*(input: string): Tokens =
             return
     
         if spaceCount mod 4 != 0:
-            echo "[Line ", $line, "] Indentation error: indentation must be a multiple of 4 spaces"
-            quit(1)
+            addDiagnostic("Indentation must be a multiple of 4 spaces")
+            return
     
         let indentLevel = spaceCount div 4
         let currentIndentLevel = indentStack[^1]
     
         if indentLevel > currentIndentLevel:
             if indentLevel != currentIndentLevel + 1:
-                echo "[Line ", $line, "] Indentation error: unexpected indent"
-                quit(1)
+                addDiagnostic("Unexpected indent")
+                return
             indentStack.add(indentLevel)
-            addToken("++++", TokenKind.Indent)
+            addToken(TokenKind.Indent)
         elif indentLevel < currentIndentLevel:
             while indentStack.len > 0 and indentStack[^1] > indentLevel:
                 indentStack.setLen(indentStack.len - 1)
-                addToken("----", TokenKind.Dedent)
+                addToken(TokenKind.Dedent)
         
     while not isAtEnd():
         let character = input[index]
         
         case character
         of '(':
-            addToken($character, TokenKind.LeftRoundBracket)
+            addToken(TokenKind.LeftRoundBracket, $character)
             index.inc()
         of ')':
-            addToken($character, TokenKind.RightRoundBracket)
+            addToken(TokenKind.RightRoundBracket, $character)
             index.inc()
         of '{':
-            addToken($character, TokenKind.LeftCurlyBracket)
+            addToken(TokenKind.LeftCurlyBracket, $character)
             index.inc()
         of '}':
-            addToken($character, TokenKind.RightCurlyBracket)
+            addToken(TokenKind.RightCurlyBracket, $character)
             index.inc()
         of '[':
-            addToken($character, TokenKind.LeftSquareBracket)
+            addToken(TokenKind.LeftSquareBracket, $character)
             index.inc()
         of ']':
-            addToken($character, TokenKind.RightSquareBracket)
+            addToken(TokenKind.RightSquareBracket, $character)
             index.inc()
         of ',':
-            addToken($character, TokenKind.Comma)
+            addToken(TokenKind.Comma, $character)
             index.inc()
         of '.':
-            addToken($character, TokenKind.Dot)
+            addToken(TokenKind.Dot, $character)
             index.inc()
         of ':':
-            addToken($character, TokenKind.Colon)
+            addToken(TokenKind.Colon, $character)
             index.inc()
         of '-':
-            addToken($character, TokenKind.Minus)
+            addToken(TokenKind.Minus, $character)
             index.inc()
         of '+':
-            addToken($character, TokenKind.Plus)
+            addToken(TokenKind.Plus, $character)
             index.inc()
         of '*':
-            addToken($character, TokenKind.Asterisk)
+            addToken(TokenKind.Asterisk, $character)
             index.inc()
         of '/':
-            addToken($character, TokenKind.Slash)
+            addToken(TokenKind.Slash, $character)
             index.inc()
         of '$':
-            addToken($character, TokenKind.Dollar)
+            addToken(TokenKind.Dollar, $character)
             index.inc()
         of '?':
-            addToken($character, TokenKind.Question)
+            addToken(TokenKind.Question, $character)
             index.inc()
         of '&':
-            addToken($character, TokenKind.Ampersand)
+            addToken(TokenKind.Ampersand, $character)
             index.inc()
         of '=':
-            addToken($character, TokenKind.Equal)
+            addToken(TokenKind.Equal, $character)
             index.inc()
         of '>':
-            addToken($character, TokenKind.MoreThan)
+            addToken(TokenKind.MoreThan, $character)
             index.inc()
         of '<':
-            addToken($character, TokenKind.LessThan)
+            addToken(TokenKind.LessThan, $character)
             index.inc()
         of '|':
-            addToken($character, TokenKind.Bar)
+            addToken(TokenKind.Bar, $character)
             index.inc()
         of '#':
+            # Ignore single line comment
             while not isAtEnd() and not isCurrentCharacter('\n'):
                 index.inc()
         of '_':
             if isNextCharacter('<'):
                 index.inc(2)
-                addToken("_<", TokenKind.UnderscoreLessThan)
+                addToken(TokenKind.UnderscoreLessThan, "_<")
             else:
-                addToken($character, TokenKind.Underscore)
+                addToken(TokenKind.Underscore, $character)
                 index.inc()
         of '\n':
             line.inc()
-            #addToken("\n", TokenKind.NewLine)
             index.inc()
             handleIndentation()
         of ' ', '\\':
             index.inc()
         of '!':
             if isNextCharacter('='):
-                addToken("!=", ExclamationEqual)
+                addToken(TokenKind.ExclamationEqual, "!=")
                 index.inc(2)
             elif isNextCharacter('>'):
-                addToken("!>", ExclamationMoreThan)
+                addToken(TokenKind.ExclamationMoreThan, "!>")
                 index.inc(2)
             elif isNextCharacter('<'): 
-                addToken("!<", ExclamationLessThan)
+                addToken(TokenKind.ExclamationLessThan, "!<")
                 index.inc(2)
             else: 
-                addToken($character, Exclamation)
+                addToken(TokenKind.Exclamation, $character)
                 index.inc()
         of '"':
             string()
@@ -231,13 +233,13 @@ proc lexer*(input: string): Tokens =
             elif isAlphabet(character):
                 identifier()
             else:
-                addToken("[Line " & $line & "] Unexpected character: `" & $character & "`", TokenKind.Illegal)
+                addDiagnostic("Unexpected character: `" & $character & "`")
                 break
 
 
-    addToken("", TokenKind.EndOfFile)
+    addToken(TokenKind.EndOfFile)
     
-    return tokens
+    return LexerOutput(diagnostics: diagnostics, tokens: tokens)
 
 
 
