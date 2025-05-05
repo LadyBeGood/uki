@@ -1,0 +1,65 @@
+
+
+identifier:
+    accumulate: ""
+    
+    loop (!is-at-end) & is-alpha-numeric current-character
+        accumulate = accumulate | current-character
+        index = index + 1
+    
+    # Check if the identifier is a keyword
+    when has-key keywords, accumulate
+        add-token accumulate, keywords.accumulate 
+    then
+        add-token accumulate, identifier
+
+
+
+counter:
+    count: 0
+    
+    increment:
+        count = count + 1
+    
+    decrement:
+        count = count - 1
+    
+    exit <
+        input
+            input-type ~ "text"
+            input-value ~ $count
+            input-editable ~ wrong
+        
+        button
+            text-content ~ "Increment"
+            event-click ~ {increment}
+        
+        button
+            text-content ~ "Decrement"
+            event-click ~ {decrement}
+    >
+
+
+
+
+
+when is-main-module & !defined test
+    import os, json
+    
+    input-file: "input.uki"
+    output-file: "output.lexer"
+
+    when !file-exists input-file
+        error "Error: Input file 'input.uki' not found"
+
+    input: read-file input-file
+    tokens: lexer input
+    formatted: pretty (json tokens), indent ~ 4
+    
+    shout formatted
+    write-file output-file, formatted
+
+
+
+
+

@@ -1,0 +1,232 @@
+[
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "identifier",
+        "line": 3
+    },
+    {
+        "tokenKind": "Colon",
+        "lexeme": ":",
+        "line": 3
+    },
+    {
+        "tokenKind": "Indent",
+        "lexeme": "++++",
+        "line": 4
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "accumulate",
+        "line": 4
+    },
+    {
+        "tokenKind": "Colon",
+        "lexeme": ":",
+        "line": 4
+    },
+    {
+        "tokenKind": "UninterpolatedStringLiteral",
+        "lexeme": "\n    \n    \n    ",
+        "line": 7
+    },
+    {
+        "tokenKind": "LoopKeyword",
+        "lexeme": "loop",
+        "line": 9
+    },
+    {
+        "tokenKind": "LeftRoundBracket",
+        "lexeme": "(",
+        "line": 9
+    },
+    {
+        "tokenKind": "Exclamation",
+        "lexeme": "!",
+        "line": 9
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "is-at-end",
+        "line": 9
+    },
+    {
+        "tokenKind": "RightRoundBracket",
+        "lexeme": ")",
+        "line": 9
+    },
+    {
+        "tokenKind": "Ampersand",
+        "lexeme": "&",
+        "line": 9
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "is-alpha-numeric",
+        "line": 9
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "current-character",
+        "line": 9
+    },
+    {
+        "tokenKind": "Indent",
+        "lexeme": "++++",
+        "line": 10
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "accumulate",
+        "line": 10
+    },
+    {
+        "tokenKind": "Equal",
+        "lexeme": "=",
+        "line": 10
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "accumulate",
+        "line": 10
+    },
+    {
+        "tokenKind": "Bar",
+        "lexeme": "|",
+        "line": 10
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "current-character",
+        "line": 10
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "index",
+        "line": 11
+    },
+    {
+        "tokenKind": "Equal",
+        "lexeme": "=",
+        "line": 11
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "index",
+        "line": 11
+    },
+    {
+        "tokenKind": "Plus",
+        "lexeme": "+",
+        "line": 11
+    },
+    {
+        "tokenKind": "NumericLiteral",
+        "lexeme": "1",
+        "line": 11
+    },
+    {
+        "tokenKind": "Dedent",
+        "lexeme": "----",
+        "line": 13
+    },
+    {
+        "tokenKind": "WhenKeyword",
+        "lexeme": "when",
+        "line": 14
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "has-key",
+        "line": 14
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "keywords",
+        "line": 14
+    },
+    {
+        "tokenKind": "Comma",
+        "lexeme": ",",
+        "line": 14
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "accumulate",
+        "line": 14
+    },
+    {
+        "tokenKind": "Indent",
+        "lexeme": "++++",
+        "line": 15
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "add-token",
+        "line": 15
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "accumulate",
+        "line": 15
+    },
+    {
+        "tokenKind": "Comma",
+        "lexeme": ",",
+        "line": 15
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "keywords",
+        "line": 15
+    },
+    {
+        "tokenKind": "Dot",
+        "lexeme": ".",
+        "line": 15
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "accumulate",
+        "line": 15
+    },
+    {
+        "tokenKind": "Dedent",
+        "lexeme": "----",
+        "line": 16
+    },
+    {
+        "tokenKind": "ThenKeyword",
+        "lexeme": "then",
+        "line": 16
+    },
+    {
+        "tokenKind": "Indent",
+        "lexeme": "++++",
+        "line": 17
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "add-token",
+        "line": 17
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "accumulate",
+        "line": 17
+    },
+    {
+        "tokenKind": "Comma",
+        "lexeme": ",",
+        "line": 17
+    },
+    {
+        "tokenKind": "Identifier",
+        "lexeme": "identifier",
+        "line": 17
+    },
+    {
+        "tokenKind": "EndOfFile",
+        "lexeme": "",
+        "line": 23
+    }
+]
