@@ -251,7 +251,7 @@ proc lexer*(input: string): LexerOutput =
 when isMainModule:
     import os, json
     
-    let input: string = ""
+    let input: string = "2 + 2"
 
     let tokens = lexer(input)
     let formatted = pretty(%tokens, indent = 4)
