@@ -3,26 +3,26 @@
 ```
 uki
 ├── code
-│   ├── compiler
-│   │   ├── codegen.nim
-│   │   ├── lexer.nim
-│   │   ├── parser.nim
-│   │   ├── types.nim
-│   │   └── uki.nim
-│   └── utilities
-│       └── debugging.nim
+│   ├── compiler
+│   │   ├── codegen.nim
+│   │   ├── lexer.nim
+│   │   ├── parser.nim
+│   │   ├── types.nim
+│   │   └── uki.nim
+│   └── utilities
+│       └── debugging.nim
 ├── documentation
-│   ├── grammar.txt
-│   └── introduction.md
+│   ├── grammar.txt
+│   └── introduction.md
 ├── garbage
-│   ├── example.uki
-│   ├── input.uki
-│   ├── lexer
-│   └── output.lexer
-├── test
-│   └── lexer.test.nim
+│   ├── example.uki
+│   ├── input.uki
+│   ├── lexer
+│   └── output.lexer
 ├── license.txt
-└── readme.md
+├── readme.md
+└── test
+    └── lexer.test.nim
 ```
 
 ## License
