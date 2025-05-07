@@ -27,7 +27,7 @@ TODO
 ```
 write "Hello World"
 ```
-In uki, `write` is a build-in function and arguments of a function are 
+`write` is a build-in function. Arguments of a function are 
 not required to be enclosed inside round brackets
 
 ## Comments
