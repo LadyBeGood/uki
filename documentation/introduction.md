@@ -1,5 +1,3 @@
-# Utkrisht language reference
-
 ## Table of contents
 - [Introduction](#introduction)
 - [Language Features](#language-features)
@@ -29,13 +27,18 @@ TODO
 ```
 write "Hello World"
 ```
+In uki, `write` is a build-in function and arguments of a function are 
+not required to be enclosed inside round brackets
+
 ## Comments
-### Single line comments
+### Simple comments
+Comments are ignored by the compiler. uki only supports single line comments
 ```
 # This is a comment
 ```
 ### Documentation comments
-A comment just before a `container declaration` is considered a `documentation comment`
+A comment just before a `container declaration` is considered a `documentation comment`. 
+Documentation comments are tokenised by the compiler.
 ```
 # Checking for primality using an optimised trial division primality 
 # test algorithm (1)
