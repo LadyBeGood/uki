@@ -260,7 +260,7 @@ when isMainModule:
 
     let tokens = lexer(input)
     let formatted = pretty(%tokens, indent = 4)
-    shout formatted
+    shout formatted, tokens
 
 
 

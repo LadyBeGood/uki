@@ -93,7 +93,28 @@ type
         diagnostics*: Diagnostics
         tokens*: Tokens
  
-   
+    NodeKind* = enum
+        NumberLiteral
+        Binary
+
+    AstNode* = ref object
+        case kind*: NodeKind
+        of NumberLiteral:
+            value*: string  
+        of Binary:
+            left*: AstNode
+            right*: AstNode
+            operator*: TokenKind
+
+
+    AbstractSyntaxTree* = seq[AstNode]
+    
+    ParserOutput* = object
+        diagnostics*: Diagnostics
+        abstractSyntaxTree*: AbstractSyntaxTree
+
+
+
 #[
     Statment* = object
     
