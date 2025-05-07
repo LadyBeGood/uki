@@ -19,10 +19,10 @@ uki
 │   ├── input.uki
 │   ├── lexer
 │   └── output.lexer
+├── test
+│   └── lexer.test.nim
 ├── license.txt
-├── readme.md
-└── test
-    └── lexer.test.nim
+└── readme.md
 ```
 
 ## License
