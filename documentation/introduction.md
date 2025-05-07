@@ -22,8 +22,46 @@ Utkrisht code is compiled into plain HTML, CSS, and JavaScript that runs directl
 - **Readable compiled code**: Output is annotated with comments, so it’s understandable and debuggable.
 - **Small bundle size**: No extra code is included—only what you write and what’s needed for the browser.
 
+## Installation 
+TODO
+
 ## Hello World
 ```
 write "Hello World"
 ```
 ## Comments
+### Single line comments
+```
+# This is a comment
+```
+### Documentation comments
+A comment just before a `container declaration` is considered a `documentation comment`
+```
+# Checking for primality using an optimised trial division primality 
+# test algorithm (1)
+is-prime num:
+    when num !> 1
+        exit wrong
+    then num = 2
+        exit right
+    then (remainder num, 2) = 0
+        exit wrong
+
+    loop 3_(power num, 0.5)_2 with i
+        when (remainder num, i) = 0
+            exit wrong
+    
+    exit right
+
+# Number given by the user
+number: to-number prompt "What is your number?"
+
+# Print the message (2)
+write "|number| is a |when !is-prime number: "not "|prime number"
+```
+(1) If two comments are only seperated by a newline, the compiler treats them as 
+one
+
+(2) This comment is not considered a documentation comment
+
+
