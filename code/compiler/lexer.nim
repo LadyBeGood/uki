@@ -244,7 +244,6 @@ proc lexer*(input: string): LexerOutput =
                 index.inc()
 
     while indentStack.len > 1:  
-        # Preserve the base level 0
         indentStack.setLen(indentStack.len - 1)
         addToken(TokenKind.Dedent)
     
