@@ -71,3 +71,41 @@ primary
     | LeftRoundBracket expression RightRoundBracket
 
 
+
+
+
+
+
+
+
+
+
+
+expression 
+    equality
+
+equality
+    comparison ((ExclamationEqual | EqualEqual) comparison )*
+
+comparison
+    term ((MoreThan | ExclamationMoreThan | LessThan | ExclamationLessThan) term)*
+
+term
+    factor ((Plus | Minus) factor)*
+
+factor
+    unary ((Slash | Asterisk) unary)*
+
+unary
+    (Plus | Minus | Exclamation) unary | primary
+    
+primary
+    | Number
+    | String 
+    | RightKeyword 
+    | WrongKeyword 
+    | LeftRoundBracket expression RightRoundBracket
+    
+
+
+

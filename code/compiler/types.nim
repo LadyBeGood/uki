@@ -11,14 +11,8 @@ type
     
         # Literals  
         NumericLiteral  
-        UninterpolatedStringLiteral  
-        RegularExpressionLiteral  
-          
-        # Pseudo-literals  
-        InterpolatedStringHeadLiteral  
-        InterpolatedStringMiddleLiteral  
-        InterpolatedStringTailLiteral  
-          
+        StringLiteral  
+    
         # Identifier  
         Identifier  
       
@@ -91,31 +85,65 @@ type
     
     LexerOutput* = object
         diagnostics*: Diagnostics
+        input*: string
         tokens*: Tokens
- 
+
+
+
+
     NodeKind* = enum
         NumberLiteral
         Binary
 
-    AstNode* = ref object
-        case kind*: NodeKind
-        of NumberLiteral:
-            value*: string  
-        of Binary:
-            left*: AstNode
-            right*: AstNode
-            operator*: TokenKind
 
 
-    AbstractSyntaxTree* = seq[AstNode]
+    AbstractSyntaxTree* = seq[Expression]
     
     ParserOutput* = object
         diagnostics*: Diagnostics
+        input*: string
+        tokens*: Tokens
         abstractSyntaxTree*: AbstractSyntaxTree
 
 
 
-#[
+    # Expressions
+    Expression* = ref object of RootObj
+    Expressions* = seq[Expression]
+
+    BinaryExpression* = ref object of Expression
+        left*: Expression
+        operator*: Token
+        right*: Expression
+
+    UnaryExpression* = ref object of Expression
+        operator*: Token
+        right*: Expression
+    
+    GroupingExpression* = ref object of Expression
+        expression*: Expression
+
+    Object = ref object of RootObj
+    
+    
+    NumericLiteral* = ref object of Object
+        value*: float
+
+    StringLiteral* = ref object of Object
+        value*: string
+    
+    BooleanLiteral* = ref object of Object
+        value*: bool
+    
+    LiteralExpression* = ref object of Expression
+        value*: Object
+    
+    
+    
+
+    
+
+discard """
     Statment* = object
     
     Statments* = seq[Statment]
@@ -212,5 +240,5 @@ type
     BlockStatement = ref object of Statement
         statements: Statements
 
-]#
+"""
 

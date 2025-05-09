@@ -5,7 +5,7 @@
 ## See the license.txt file in the root of this repository.
 
 import tables
-import types, ../utilities/debugging
+import types
 
 
 proc lexer*(input: string): LexerOutput =
@@ -53,7 +53,7 @@ proc lexer*(input: string): LexerOutput =
     
         # Skip the closing quote
         index.inc()  
-        addToken(TokenKind.UninterpolatedStringLiteral, accumulate)
+        addToken(TokenKind.StringLiteral, accumulate)
     
     proc identifier() =
         var accumulate = ""
@@ -220,13 +220,13 @@ proc lexer*(input: string): LexerOutput =
             index.inc()
         of '!':
             if index + 1 < input.len:
-                if input[index] == '=':
+                if input[index + 1] == '=':
                     addToken(TokenKind.ExclamationEqual, "!=")
                     index.inc(2)
-                elif input[index] == '>':
+                elif input[index + 1] == '>':
                     addToken(TokenKind.ExclamationMoreThan, "!>")
                     index.inc(2)
-                elif input[index] == '<': 
+                elif input[index + 1] == '<': 
                     addToken(TokenKind.ExclamationLessThan, "!<")
                     index.inc(2)
             else: 
@@ -249,18 +249,22 @@ proc lexer*(input: string): LexerOutput =
     
     addToken(TokenKind.EndOfFile)
     
-    return LexerOutput(diagnostics: diagnostics, tokens: tokens)
+    return LexerOutput(
+        diagnostics: diagnostics, 
+        input: input, 
+        tokens: tokens
+    )
 
 
 
 when isMainModule:
-    import os, json
+    import json, ../utilities/debugging
     
-    let input: string = "2 + 2"
+    let input: string = "right != wrong"
 
     let tokens = lexer(input)
     let formatted = pretty(%tokens, indent = 4)
-    shout formatted, tokens
+    shout formatted
 
 
 

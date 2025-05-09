@@ -4,98 +4,154 @@
 ## This file is part of Utkrisht and is licensed under the AGPL-3.0-or-later.
 ## See the license.txt file in the root of this repository.
 
-import types, strutils
-
-type
-    ParserOutput* = object
-        diagnostics: Diagnostics
-        abstractSyntaxTree: seq[AstNode]    # Correctly define the abstract syntax tree
+import types, strutils, ../utilities/debugging
 
 proc parser*(lexerOutput: LexerOutput): ParserOutput =
     var index = 0
     var diagnostics: Diagnostics = lexerOutput.diagnostics
-    var abstractSyntaxTree: seq[AstNode]    # A sequence of AstNode objects
-
-    let tokenStream = lexerOutput.tokens
-
-    proc current(): Token =
-        if index < tokenStream.len: tokenStream[index]
-        else: tokenStream[^1]    # fallback to EOF
-
-    proc advance() =
-        if index < tokenStream.len: inc index
-
-    proc match(kind: TokenKind): bool =
-        if current().tokenKind == kind:
-            advance()
-            return true
-        return false
-
-    proc addDiagnostic(msg: string) =
-        let line = current().line
-        diagnostics.add Diagnostic(diagnosticKind: DiagnosticKind.Parser, errorMessage: msg, line: line)
+    var tokens: Tokens = lexerOutput.tokens
+    var abstractSyntaxTree: Expressions
 
     proc isAtEnd(): bool =
-        current().tokenKind == TokenKind.EndOfFile
+        return tokens[index].tokenKind == EndOfFile
 
-    proc expression(): AstNode
+    proc isCurrentTokenKind(tokenKinds: varargs[TokenKind]): bool =
+        if isAtEnd(): 
+            return false
+        for tokenKind in tokenKinds:
+            if tokens[index].tokenKind == tokenKind:
+                return true
+        return false
 
-    proc factor(): AstNode =
-        let token = current()
-        if match(TokenKind.NumericLiteral):
-            return AstNode(kind: NodeKind.NumberLiteral, value: token.lexeme)
-        else:
-            addDiagnostic("Expected number")
-            advance()
-            return AstNode(kind: NodeKind.Error)
 
-    proc term(): AstNode =
-        var node = factor()
-        while current().kind == TokenKind.Star:
-            let op = current()
-            advance()
-            let rhs = factor()
-            node = AstNode(kind: NodeKind.Binary,
-                                         left: node,
-                                         operator: op,
-                                         right: rhs)
-        return node
+    proc expression(): Expression
+    
+    
+    proc primary(): Expression =
+        if isCurrentTokenKind(TokenKind.RightKeyword):
+            index.inc()            
+            return LiteralExpression(value: BooleanLiteral(value: true))
+        if isCurrentTokenKind(TokenKind.WrongKeyword):
+            index.inc()            
+            return LiteralExpression(value: BooleanLiteral(value: false))
+        if isCurrentTokenKind(TokenKind.StringLiteral):
+            index.inc()            
+            return LiteralExpression(value: StringLiteral(value: tokens[index].lexeme))
+        if isCurrentTokenKind(TokenKind.NumericLiteral):
+            echo 9
+            index.inc()
+            return LiteralExpression(value: NumericLiteral(value: parseFloat(tokens[index - 1].lexeme)))
+        if isCurrentTokenKind(TokenKind.LeftRoundBracket):
+            echo 15
+            index.inc()            
+            let expression: Expression = expression()
+            echo 16
+            if tokens[index].tokenKind == TokenKind.RightRoundBracket: 
+                index.inc() 
+                echo 17
+            else:
+                echo "error"
+            echo 18
+            return GroupingExpression(expression: expression)
 
-    proc expression(): AstNode =
-        var node = term()
-        while current().kind == TokenKind.Plus:
-            let op = current()
-            advance()
-            let rhs = term()
-            node = AstNode(kind: NodeKind.Binary,
-                                         left: node,
-                                         operator: op,
-                                         right: rhs)
-        return node
 
-    proc declaration(): AstNode =
-        expression()
+ 
+    proc unary(): Expression =
+        echo 7
+        if isCurrentTokenKind(TokenKind.Exclamation, TokenKind.Minus):
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = unary()
+            return UnaryExpression(operator: operator, right: right)
+        echo 8
+        return primary()
+    
+    proc factor(): Expression =
+        echo 6
+        var expression: Expression = unary()
+        echo 10
+        while isCurrentTokenKind(TokenKind.Asterisk, TokenKind.Slash):  
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = unary()
+            expression = BinaryExpression(left: expression, operator: operator, right: right)
+        echo 11
+        return expression
+    
+    
+    proc term(): Expression =
+        echo 5
+        var expression: Expression = factor()
+        echo 12
+        while isCurrentTokenKind(TokenKind.Plus, TokenKind.Minus):
+            echo 13
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = factor()
+            expression = BinaryExpression(left: expression, operator: operator, right: right)
+    
+        echo 19
+        
+        return expression
+    
+    
+    proc comparison(): Expression =
+        echo 4
+        var expression: Expression = term()
+        
+        while isCurrentTokenKind(TokenKind.MoreThan, TokenKind.LessThan, TokenKind.ExclamationMoreThan, TokenKind.ExclamationLessThan):
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = term()
+            expression = BinaryExpression(left: expression, operator: operator, right: right)
+        echo 20
+        return expression
+    
+    
+    proc equality(): Expression =
+        echo 3
+        var expression: Expression = comparison()
+        
+        while isCurrentTokenKind(TokenKind.Equal, TokenKind.ExclamationEqual):
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = comparison()
+            expression = BinaryExpression(left: expression, operator: operator, right: right)
+        echo 21
+        return expression
+    
+    proc expression(): Expression =
+        echo 2
+        return equality()
+    
 
     while not isAtEnd():
-        let decl = declaration()
-        abstractSyntaxTree.add decl    # Add the parsed nodes to the AST
-
-    result = ParserOutput(
+        echo 1 
+        add abstractSyntaxTree, expression()
+        echo 14
+    
+    return ParserOutput(
         diagnostics: diagnostics,
-        abstractSyntaxTree: abstractSyntaxTree    # Return the AST
+        input: lexerOutput.input,
+        tokens: tokens,
+        abstractSyntaxTree: abstractSyntaxTree
     )
 
-# Sample usage
+
+
+
 when isMainModule:
-    let lexerOutput = LexerOutput(
-        diagnostics: @[],
-        tokens: @[
-            Token(kind: TokenKind.NumericLiteral, lexeme: "2", line: 1),
-            Token(kind: TokenKind.Plus, lexeme: "+", line: 1),
-            Token(kind: TokenKind.NumericLiteral, lexeme: "5", line: 1),
-            Token(kind: TokenKind.Star, lexeme: "*", line: 1),
-            Token(kind: TokenKind.NumericLiteral, lexeme: "3", line: 1),
-            Token(kind: TokenKind.EndOfFile, lexeme: "", line: 1)
-        ]
-    )
-    echo parser(lexerOutput)
+    import lexer, json
+    
+    let input = "10 * 3 !< 2 != 20 + 2"
+    let parsed = parser(lexer(input))
+    echo pretty(%parsed, indent = 4)
+    echo "=== AST Hierarchy ==="
+    printAST(parsed)
+
+
+
+
+
+
+    
