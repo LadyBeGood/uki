@@ -132,8 +132,6 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
     
     return ParserOutput(
         diagnostics: diagnostics,
-        input: lexerOutput.input,
-        tokens: tokens,
         abstractSyntaxTree: abstractSyntaxTree
     )
 
@@ -143,7 +141,7 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
 when isMainModule:
     import lexer, json
     
-    let input = "10 * 3 !< 2 != 20 + 2"
+    let input = readFile("./garbage/input.uki")
     let parsed = parser(lexer(input))
     echo pretty(%parsed, indent = 4)
     echo "=== AST Hierarchy ==="

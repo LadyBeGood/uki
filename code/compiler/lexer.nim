@@ -262,10 +262,5 @@ when isMainModule:
     
     let lexerOutput = lexer(input)
     #let formatted = pretty(%tokens, indent = 4)
-    echo lexerOutput.tokens[1]
-
-
-
-
-
+    echo lexerOutput.tokens[0].lexeme == "is-prime"
 

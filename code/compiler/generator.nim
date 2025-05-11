@@ -5,45 +5,63 @@
 ## See the license.txt file in the root of this repository.
 
 
-import ast
-import sequtils, strutils
+import types
 
-proc generateExpr(expr: Expr): string =
-    case expr.kind
-    of ExprKind.Number: $expr.numVal
-    of ExprKind.String: "\"" & expr.strVal & "\""
-    of ExprKind.Boolean: $expr.boolVal
-    of ExprKind.Null: "null"
-    of ExprKind.Identifier: expr.identName
-    of ExprKind.Binary:
-        "(" & generateExpr(expr.left) & " " & expr.binaryOp.lexeme & " " & generateExpr(expr.right) & ")"
-    of ExprKind.Unary:
-        expr.unaryOp.lexeme & generateExpr(expr.operand)
-    of ExprKind.Grouping:
-        "(" & generateExpr(expr.grouped) & ")"
-    of ExprKind.Call:
-        generateExpr(expr.callee) & "(" & expr.args.map(generateExpr).join(", ") & ")"
-    of ExprKind.Assign:
-        expr.assignTo & " = " & generateExpr(expr.value)
+proc literalGenerator(literal: Literal): string =
+    if literal of NumericLiteral:
+        let literal: NumericLiteral = NumericLiteral(literal)
+        return $literal.value
+    elif literal of StringLiteral: 
+        let literal: StringLiteral = StringLiteral(literal)
+        return "\"" & literal.value & "\""
+    elif literal of BooleanLiteral: 
+        let literal: BooleanLiteral = BooleanLiteral(literal)
+        return $literal.value
 
-proc generateStmt(stmt: Stmt): string =
-    case stmt.kind
-    of StmtKind.PrintStmt: "console.log(" & generateExpr(stmt.printExpr) & ");"
-    of StmtKind.ExprStmt: generateExpr(stmt.expr) & ";"
-    of StmtKind.VarDecl:
-        "let " & stmt.varName & 
-        (if stmt.varInit != nil: " = " & generateExpr(stmt.varInit) else: "") & ";"
-    of StmtKind.Block: "{\n" & stmt.statements.map(generateStmt).join("\n") & "\n}"
-    of StmtKind.IfStmt:
-        "if (" & generateExpr(stmt.condition) & ") " & generateStmt(stmt.thenBranch) &
-        (if stmt.elseBranch != nil: " else " & generateStmt(stmt.elseBranch) else: "")
-    of StmtKind.WhileStmt:
-        "while (" & generateExpr(stmt.whileCond) & ") " & generateStmt(stmt.whileBody)
-    of StmtKind.FuncDecl:
-        "function " & stmt.funcName & "(" & stmt.params.join(", ") & ") " & generateStmt(stmt.body)
-    of StmtKind.ReturnStmt:
-        "return" & (if stmt.returnVal != nil: " " & generateExpr(stmt.returnVal) else: "") & ";"
+proc expressionGenerator(expression: Expression): string =
+    if expression of LiteralExpression:
+        let expression: LiteralExpression = LiteralExpression(expression)
+        return literalGenerator(expression.value)
+    elif expression of BinaryExpression:
+        let expression: BinaryExpression = BinaryExpression(expression)
+        return "(" & expressionGenerator(expression.left) & " " & expression.operator.lexeme & " " & expressionGenerator(expression.right) & ")"
+    elif expression of UnaryExpression:
+        let expression: UnaryExpression = UnaryExpression(expression)
+        return expression.operator.lexeme & expressionGenerator(expression.right)
+    elif expression of GroupingExpression:
+        let expression: GroupingExpression = GroupingExpression(expression)
+        return "(" & expressionGenerator(expression.expression) & ")"
 
-proc generator*(stmts: seq[Stmt]): string =
-    stmts.map(generateStmt).join("\n")
+
+
+proc generator*(parserOutput: ParserOutput): string =
+    var output: string = ""
+    let abstractSyntaxTree: AbstractSyntaxTree = parserOutput.abstractSyntaxTree
+    
+    for expression in abstractSyntaxTree:
+        output &= expressionGenerator(expression)
+    
+    return output
+
+
+
+
+# proc generateStmt(stmt: Stmt): string =
+#     case stmt.kind
+#     of StmtKind.PrintStmt: "console.log(" & generateExpr(stmt.printExpr) & ");"
+#     of StmtKind.ExprStmt: generateExpr(stmt.expr) & ";"
+#     of StmtKind.VarDecl:
+#         "let " & stmt.varName & 
+#         (if stmt.varInit != nil: " = " & generateExpr(stmt.varInit) else: "") & ";"
+#     of StmtKind.Block: "{\n" & stmt.statements.map(generateStmt).join("\n") & "\n}"
+#     of StmtKind.IfStmt:
+#         "if (" & generateExpr(stmt.condition) & ") " & generateStmt(stmt.thenBranch) &
+#         (if stmt.elseBranch != nil: " else " & generateStmt(stmt.elseBranch) else: "")
+#     of StmtKind.WhileStmt:
+#         "while (" & generateExpr(stmt.whileCond) & ") " & generateStmt(stmt.whileBody)
+#     of StmtKind.FuncDecl:
+#         "function " & stmt.funcName & "(" & stmt.params.join(", ") & ") " & generateStmt(stmt.body)
+#     of StmtKind.ReturnStmt:
+#         "return" & (if stmt.returnVal != nil: " " & generateExpr(stmt.returnVal) else: "") & ";"
+
 

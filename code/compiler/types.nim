@@ -69,21 +69,21 @@ type
         Parser
         Validator
 
-    Token* = object  
+    Token* = ref object  
         tokenKind*: TokenKind
         lexeme*: string  
         line*: int 
     
     Tokens* = seq[Token]
     
-    Diagnostic* = object
+    Diagnostic* = ref object
         diagnosticKind*: DiagnosticKind
         errorMessage*: string
         line*: int
     
     Diagnostics* = seq[Diagnostic]
     
-    LexerOutput* = object
+    LexerOutput* = ref object
         diagnostics*: Diagnostics
         input*: string
         tokens*: Tokens
@@ -101,8 +101,6 @@ type
     
     ParserOutput* = object
         diagnostics*: Diagnostics
-        input*: string
-        tokens*: Tokens
         abstractSyntaxTree*: AbstractSyntaxTree
 
 
@@ -123,25 +121,27 @@ type
     GroupingExpression* = ref object of Expression
         expression*: Expression
 
-    Object = ref object of RootObj
+    LiteralExpression* = ref object of Expression
+        value*: Literal
     
+    # Literals
+    Literal* = ref object of RootObj
     
-    NumericLiteral* = ref object of Object
+    NumericLiteral* = ref object of Literal
         value*: float
 
-    StringLiteral* = ref object of Object
+    StringLiteral* = ref object of Literal
         value*: string
     
-    BooleanLiteral* = ref object of Object
+    BooleanLiteral* = ref object of Literal
         value*: bool
     
-    LiteralExpression* = ref object of Expression
-        value*: Object
-    
-    
-    
 
-    
+
+
+
+
+
 
 discard """
     Statment* = object
