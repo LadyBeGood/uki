@@ -14,7 +14,19 @@ proc lexer*(input: string): LexerOutput =
     var diagnostics: Diagnostics
     var line: int = 1
     var indentStack = @[0]
-
+    const keywords = {
+        "try": TokenKind.TryKeyword,
+        "fix": TokenKind.FixKeyword,
+        "when": TokenKind.WhenKeyword,
+        "then": TokenKind.ThenKeyword,
+        "loop": TokenKind.LoopKeyword,
+        "with": TokenKind.WithKeyword,
+        "right": TokenKind.RightKeyword,
+        "wrong": TokenKind.WrongKeyword,
+        "import": TokenKind.ImportKeyword,
+        "export": TokenKind.ExportKeyword
+    }.toTable
+    
     proc addToken(tokenKind: TokenKind, lexeme: string = "") =
         add tokens, Token(tokenKind: tokenKind, lexeme: lexeme, line: line)
     
@@ -48,7 +60,7 @@ proc lexer*(input: string): LexerOutput =
             elif input[index] == '\n':
                 line.inc()
     
-            accumulate &= $input[index]
+            accumulate.add(input[index])
             index.inc()
     
         # Skip the closing quote
@@ -58,22 +70,8 @@ proc lexer*(input: string): LexerOutput =
     proc identifier() =
         var accumulate = ""
         while not isAtEnd() and isAlphaNumeric(input[index]):
-            accumulate &= $input[index]
-        
+            accumulate.add(input[index])
             index.inc()
-        
-        const keywords = {
-            "try": TokenKind.TryKeyword,
-            "fix": TokenKind.FixKeyword,
-            "when": TokenKind.WhenKeyword,
-            "then": TokenKind.ThenKeyword,
-            "loop": TokenKind.LoopKeyword,
-            "with": TokenKind.WithKeyword,
-            "right": TokenKind.RightKeyword,
-            "wrong": TokenKind.WrongKeyword,
-            "import": TokenKind.ImportKeyword,
-            "export": TokenKind.ExportKeyword
-        }.toTable
         
         # Check if the identifier is a keyword
         if keywords.hasKey(accumulate):
@@ -83,11 +81,10 @@ proc lexer*(input: string): LexerOutput =
 
 
     proc number(isNegative: bool = false) =
-        var accumulate = if isNegative: "-" else: ""
+        var accumulate = if isNegative: "-" else: "" 
         while not isAtEnd() and isDigit(input[index]):
-            accumulate &= input[index]
+            accumulate.add(input[index])
             index.inc()
-
         addToken(TokenKind.NumericLiteral, accumulate)
     
     proc handleIndentation() =
@@ -215,6 +212,7 @@ proc lexer*(input: string): LexerOutput =
         of '\n':
             line.inc()
             index.inc()
+            addToken(TokenKind.Newline)
             handleIndentation()
         of ' ', '\\':
             index.inc()
@@ -258,13 +256,13 @@ proc lexer*(input: string): LexerOutput =
 
 
 when isMainModule:
-    import json, ../utilities/debugging
+    #import json, ../utilities/debugging
     
-    let input: string = "right != wrong"
-
-    let tokens = lexer(input)
-    let formatted = pretty(%tokens, indent = 4)
-    shout formatted
+    var input = readFile("./garbage/input.uki")
+    
+    let lexerOutput = lexer(input)
+    #let formatted = pretty(%tokens, indent = 4)
+    echo lexerOutput.tokens[1]
 
 
 

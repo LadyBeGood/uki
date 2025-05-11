@@ -5,7 +5,7 @@
 ## See the license.txt file in the root of this repository.
 
 
-import lexer, types#, parser, codegen, tokens
+import types, lexer#, parser, generator
 import os, strutils
 
 proc compile*(input: string): string =

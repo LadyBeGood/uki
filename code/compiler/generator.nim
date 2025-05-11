@@ -44,5 +44,6 @@ proc generateStmt(stmt: Stmt): string =
     of StmtKind.ReturnStmt:
         "return" & (if stmt.returnVal != nil: " " & generateExpr(stmt.returnVal) else: "") & ";"
 
-proc generate*(stmts: seq[Stmt]): string =
+proc generator*(stmts: seq[Stmt]): string =
     stmts.map(generateStmt).join("\n")
+
