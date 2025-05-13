@@ -10,7 +10,7 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
     var index = 0
     var diagnostics: Diagnostics = lexerOutput.diagnostics
     var tokens: Tokens = lexerOutput.tokens
-    var abstractSyntaxTree: Expressions
+    var abstractSyntaxTree: Statements
 
     proc isAtEnd(): bool =
         return tokens[index].tokenKind == EndOfFile
@@ -25,9 +25,10 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
 
 
     proc expression(): Expression
+    proc statement(): Statement
     
     
-    proc primary(): Expression =
+    proc primaryExpression(): Expression =
         if isCurrentTokenKind(TokenKind.RightKeyword):
             index.inc()            
             return LiteralExpression(value: BooleanLiteral(value: true))
@@ -38,116 +39,93 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
             index.inc()            
             return LiteralExpression(value: StringLiteral(value: tokens[index].lexeme))
         if isCurrentTokenKind(TokenKind.NumericLiteral):
-            echo 9
             index.inc()
             return LiteralExpression(value: NumericLiteral(value: parseFloat(tokens[index - 1].lexeme)))
         if isCurrentTokenKind(TokenKind.LeftRoundBracket):
-            echo 15
             index.inc()            
             let expression: Expression = expression()
-            echo 16
             if tokens[index].tokenKind == TokenKind.RightRoundBracket: 
                 index.inc() 
-                echo 17
             else:
-                echo "error"
-            echo 18
+                diagnostics.add(Diagnostic(diagnosticKind: DiagnosticKind.Parser, errorMessage: "Bro where is the `)` 🤔", line: tokens[index].line))
+                echo "Parser synchronisation is not available currently"
+                quit(1)
             return GroupingExpression(expression: expression)
 
 
  
-    proc unary(): Expression =
-        echo 7
+    proc unaryExpression(): Expression =
         if isCurrentTokenKind(TokenKind.Exclamation, TokenKind.Minus):
             let operator: Token = tokens[index]
             index.inc()
-            let right: Expression = unary()
+            let right: Expression = unaryExpression()
             return UnaryExpression(operator: operator, right: right)
-        echo 8
-        return primary()
+            
+        return primaryExpression()
     
-    proc factor(): Expression =
-        echo 6
-        var expression: Expression = unary()
-        echo 10
+    proc factorExpression(): Expression =
+        var expression: Expression = unaryExpression()
+        
         while isCurrentTokenKind(TokenKind.Asterisk, TokenKind.Slash):  
             let operator: Token = tokens[index]
             index.inc()
-            let right: Expression = unary()
+            let right: Expression = unaryExpression()
             expression = BinaryExpression(left: expression, operator: operator, right: right)
-        echo 11
-        return expression
-    
-    
-    proc term(): Expression =
-        echo 5
-        var expression: Expression = factor()
-        echo 12
-        while isCurrentTokenKind(TokenKind.Plus, TokenKind.Minus):
-            echo 13
-            let operator: Token = tokens[index]
-            index.inc()
-            let right: Expression = factor()
-            expression = BinaryExpression(left: expression, operator: operator, right: right)
-    
-        echo 19
         
         return expression
     
     
-    proc comparison(): Expression =
-        echo 4
-        var expression: Expression = term()
+    proc termExpression(): Expression =
+        var expression: Expression = factorExpression()
+
+        while isCurrentTokenKind(TokenKind.Plus, TokenKind.Minus):
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = factorExpression()
+            expression = BinaryExpression(left: expression, operator: operator, right: right)
+        
+        return expression
+    
+    
+    proc comparisonExpression(): Expression =
+        var expression: Expression = termExpression()
         
         while isCurrentTokenKind(TokenKind.MoreThan, TokenKind.LessThan, TokenKind.ExclamationMoreThan, TokenKind.ExclamationLessThan):
             let operator: Token = tokens[index]
             index.inc()
-            let right: Expression = term()
+            let right: Expression = termExpression()
             expression = BinaryExpression(left: expression, operator: operator, right: right)
-        echo 20
+
         return expression
     
     
-    proc equality(): Expression =
-        echo 3
-        var expression: Expression = comparison()
+    proc equalityExpression(): Expression =
+        var expression: Expression = comparisonExpression()
         
         while isCurrentTokenKind(TokenKind.Equal, TokenKind.ExclamationEqual):
             let operator: Token = tokens[index]
             index.inc()
-            let right: Expression = comparison()
+            let right: Expression = comparisonExpression()
             expression = BinaryExpression(left: expression, operator: operator, right: right)
-        echo 21
+
         return expression
     
     proc expression(): Expression =
-        echo 2
-        return equality()
+        return equalityExpression()
     
+    proc expressionStatement(): Statement =
+        return ExpressionStatement(expression: expression())
+    
+    proc statement(): Statement =
+        return expressionStatement()
 
     while not isAtEnd():
-        echo 1 
-        add abstractSyntaxTree, expression()
-        echo 14
+        add abstractSyntaxTree, statement()
     
     return ParserOutput(
         diagnostics: diagnostics,
         abstractSyntaxTree: abstractSyntaxTree
     )
-
-
-
-
-when isMainModule:
-    import lexer, json
-    
-    let input = readFile("./garbage/input.uki")
-    let parsed = parser(lexer(input))
-    echo pretty(%parsed, indent = 4)
-    echo "=== AST Hierarchy ==="
-    printAST(parsed)
-
-
 
 
 

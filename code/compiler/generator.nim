@@ -33,35 +33,23 @@ proc expressionGenerator(expression: Expression): string =
         return "(" & expressionGenerator(expression.expression) & ")"
 
 
+proc statementGenerator(statement: Statement): string =
+    if statement of ExpressionStatement:
+        let statement: ExpressionStatement = ExpressionStatement(statement)
+        return expressionGenerator(statement.expression)
+
 
 proc generator*(parserOutput: ParserOutput): string =
     var output: string = ""
-    let abstractSyntaxTree: AbstractSyntaxTree = parserOutput.abstractSyntaxTree
+    let abstractSyntaxTree: Statements = parserOutput.abstractSyntaxTree
     
-    for expression in abstractSyntaxTree:
-        output &= expressionGenerator(expression)
+    for statement in abstractSyntaxTree:
+        output &= statementGenerator(statement)
     
     return output
 
 
 
 
-# proc generateStmt(stmt: Stmt): string =
-#     case stmt.kind
-#     of StmtKind.PrintStmt: "console.log(" & generateExpr(stmt.printExpr) & ");"
-#     of StmtKind.ExprStmt: generateExpr(stmt.expr) & ";"
-#     of StmtKind.VarDecl:
-#         "let " & stmt.varName & 
-#         (if stmt.varInit != nil: " = " & generateExpr(stmt.varInit) else: "") & ";"
-#     of StmtKind.Block: "{\n" & stmt.statements.map(generateStmt).join("\n") & "\n}"
-#     of StmtKind.IfStmt:
-#         "if (" & generateExpr(stmt.condition) & ") " & generateStmt(stmt.thenBranch) &
-#         (if stmt.elseBranch != nil: " else " & generateStmt(stmt.elseBranch) else: "")
-#     of StmtKind.WhileStmt:
-#         "while (" & generateExpr(stmt.whileCond) & ") " & generateStmt(stmt.whileBody)
-#     of StmtKind.FuncDecl:
-#         "function " & stmt.funcName & "(" & stmt.params.join(", ") & ") " & generateStmt(stmt.body)
-#     of StmtKind.ReturnStmt:
-#         "return" & (if stmt.returnVal != nil: " " & generateExpr(stmt.returnVal) else: "") & ";"
 
 

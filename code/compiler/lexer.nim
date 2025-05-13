@@ -87,6 +87,7 @@ proc lexer*(input: string): LexerOutput =
             index.inc()
         addToken(TokenKind.NumericLiteral, accumulate)
     
+    # I created this, but chatGPT fixed edge cases, so i don't know how it works, although it works
     proc handleIndentation() =
         var spaceCount = 0
     
@@ -212,7 +213,9 @@ proc lexer*(input: string): LexerOutput =
         of '\n':
             line.inc()
             index.inc()
-            addToken(TokenKind.Newline)
+            # TODO: Only add newlines at the end of statements and not just everywhere
+            # TODO: Don't add newlines inside expressions
+            #addToken(TokenKind.Newline)
             handleIndentation()
         of ' ', '\\':
             index.inc()
@@ -249,18 +252,9 @@ proc lexer*(input: string): LexerOutput =
     
     return LexerOutput(
         diagnostics: diagnostics, 
-        input: input, 
         tokens: tokens
     )
 
 
 
-when isMainModule:
-    #import json, ../utilities/debugging
-    
-    var input = readFile("./garbage/input.uki")
-    
-    let lexerOutput = lexer(input)
-    #let formatted = pretty(%tokens, indent = 4)
-    echo lexerOutput.tokens[0].lexeme == "is-prime"
 
