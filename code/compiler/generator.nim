@@ -4,7 +4,7 @@
 ## This file is part of Utkrisht and is licensed under the AGPL-3.0-or-later.
 ## See the license.txt file in the root of this repository.
 
-#
+
 import types
 
 proc literalGenerator(literal: Literal): string =
