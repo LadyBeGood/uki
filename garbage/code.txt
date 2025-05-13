@@ -1,0 +1,620 @@
+# compiler.nim
+import types, lexer, parser, generator
+
+proc compiler*(input: string): string =
+    return generator(parser(lexer(input)))
+
+
+when isMainModule:
+    let input: string = readFile("./garbage/input.uki")
+    let output: string = compiler(input)
+    writeFile("./garbage/output.js", output)
+
+
+
+
+# types.nim
+
+type
+    TokenKind* {.pure.} = enum
+        Illegal
+        EndOfFile
+    
+        # Literals  
+        NumericLiteral  
+        StringLiteral  
+    
+        # Identifier  
+        Identifier  
+      
+        # Punctuation  
+        LeftRoundBracket   
+        RightRoundBracket   
+        LeftCurlyBracket   
+        RightCurlyBracket  
+        LeftSquareBracket   
+        RightSquareBracket  
+        Dot  
+        Comma  
+        Exclamation  
+        Ampersand  
+        Question  
+        Colon  
+        Equal  
+        LessThan  
+        MoreThan  
+        ExclamationEqual  
+        ExclamationLessThan  
+        ExclamationMoreThan  
+        Plus  
+        Minus  
+        Asterisk  
+        Slash  
+        Bar  
+        Tilde  
+        Hash  
+        Underscore  
+        UnderscoreLessThan  
+        NewLine  
+        Dollar  
+          
+      
+        # Reserved words  
+        WhenKeyword  
+        ThenKeyword  
+        TryKeyword  
+        FixKeyword  
+        LoopKeyword  
+        WithKeyword  
+        ImportKeyword  
+        ExportKeyword  
+        RightKeyword  
+        WrongKeyword  
+      
+        # Spacing  
+        Indent  
+        Dedent  
+    
+    DiagnosticKind* {.pure.} = enum
+        Lexer
+        Parser
+        Validator
+
+    Token* = ref object  
+        tokenKind*: TokenKind
+        lexeme*: string  
+        line*: int 
+    
+    Tokens* = seq[Token]
+    
+    Diagnostic* = ref object
+        diagnosticKind*: DiagnosticKind
+        errorMessage*: string
+        line*: int
+    
+    Diagnostics* = seq[Diagnostic]
+    
+    LexerOutput* = ref object
+        diagnostics*: Diagnostics
+        tokens*: Tokens
+
+    
+    ParserOutput* = object
+        diagnostics*: Diagnostics
+        abstractSyntaxTree*: Statements
+
+
+
+    # Expressions
+    Expression* = ref object of RootObj
+    Expressions* = seq[Expression]
+
+    BinaryExpression* = ref object of Expression
+        left*: Expression
+        operator*: Token
+        right*: Expression
+
+    UnaryExpression* = ref object of Expression
+        operator*: Token
+        right*: Expression
+    
+    GroupingExpression* = ref object of Expression
+        expression*: Expression
+
+    LiteralExpression* = ref object of Expression
+        value*: Literal
+    
+    # Literals
+    Literal* = ref object of RootObj
+    
+    NumericLiteral* = ref object of Literal
+        value*: float
+
+    StringLiteral* = ref object of Literal
+        value*: string
+    
+    BooleanLiteral* = ref object of Literal
+        value*: bool
+    
+
+    # Statements, TODO
+    Statement* = ref object of RootObj
+    Statements* = seq[Statement]
+    
+    ExpressionStatement* = ref object of Statement
+        expression*: Expression
+
+
+
+
+
+
+# lexer.nim
+
+import tables
+import types
+
+
+proc lexer*(input: string): LexerOutput =
+    var index: int
+    var tokens: Tokens
+    var diagnostics: Diagnostics
+    var line: int = 1
+    var indentStack = @[0]
+    const keywords = {
+        "try": TokenKind.TryKeyword,
+        "fix": TokenKind.FixKeyword,
+        "when": TokenKind.WhenKeyword,
+        "then": TokenKind.ThenKeyword,
+        "loop": TokenKind.LoopKeyword,
+        "with": TokenKind.WithKeyword,
+        "right": TokenKind.RightKeyword,
+        "wrong": TokenKind.WrongKeyword,
+        "import": TokenKind.ImportKeyword,
+        "export": TokenKind.ExportKeyword
+    }.toTable
+    
+    proc addToken(tokenKind: TokenKind, lexeme: string = "") =
+        add tokens, Token(tokenKind: tokenKind, lexeme: lexeme, line: line)
+    
+    proc addDiagnostic(errorMessage: string) =
+        add diagnostics, Diagnostic(diagnosticKind: DiagnosticKind.Lexer, errorMessage: errorMessage, line: line)
+    
+    proc isAtEnd(): bool =
+        return index >= input.len
+
+    proc isDigit(character: char): bool =
+        return character in {'0' .. '9'}
+
+    proc isAlphabet(character: char): bool =
+        return character in {'a'..'z'}
+    
+    proc isAlphaNumeric(character: char): bool =
+        return isAlphabet(character) or isDigit(character) or character == '-'
+    
+    
+    proc string() =
+        # Skip the opening quote
+        index.inc()  
+        var accumulate = ""
+        while true:
+            if isAtEnd():
+                addDiagnostic("Unterminated string literal")
+                return
+    
+            if input[index] == '"':
+                break
+            elif input[index] == '\n':
+                line.inc()
+    
+            accumulate.add(input[index])
+            index.inc()
+    
+        # Skip the closing quote
+        index.inc()  
+        addToken(TokenKind.StringLiteral, accumulate)
+    
+    proc identifier() =
+        var accumulate = ""
+        while not isAtEnd() and isAlphaNumeric(input[index]):
+            accumulate.add(input[index])
+            index.inc()
+        
+        # Check if the identifier is a keyword
+        if keywords.hasKey(accumulate):
+            addToken(keywords[accumulate], accumulate)  
+        else:
+            addToken(TokenKind.Identifier, accumulate) 
+
+
+    proc number(isNegative: bool = false) =
+        var accumulate = if isNegative: "-" else: "" 
+        while not isAtEnd() and isDigit(input[index]):
+            accumulate.add(input[index])
+            index.inc()
+        addToken(TokenKind.NumericLiteral, accumulate)
+    
+    # I created this, but chatGPT fixed edge cases, so i don't know how it works, although it works
+    proc handleIndentation() =
+        var spaceCount = 0
+    
+        # Count leading spaces
+        while not isAtEnd() and input[index] == ' ':
+            spaceCount.inc()
+            index.inc()
+    
+        # Skip line if it's empty or contains only spaces
+        if isAtEnd() or input[index] == '\n':
+            return
+    
+        # Indentation must be a multiple of 4
+        if spaceCount mod 4 != 0:
+            addDiagnostic("Indentation must be a multiple of 4 spaces")
+            return
+    
+        let indentLevel = spaceCount div 4
+        let currentIndentLevel = indentStack[^1]
+    
+        if indentLevel > currentIndentLevel:
+            # Only allow increasing by one level at a time
+            if indentLevel != currentIndentLevel + 1:
+                addDiagnostic("Unexpected indent level: expected " &
+                    $(currentIndentLevel + 1) & " but got " & $indentLevel)
+                return
+            indentStack.add(indentLevel)
+            addToken(TokenKind.Indent)
+    
+        elif indentLevel < currentIndentLevel:
+            # Dedent to known indentation level
+            while indentStack.len > 0 and indentStack[^1] > indentLevel:
+                indentStack.setLen(indentStack.len - 1)
+                addToken(TokenKind.Dedent)
+    
+            if indentStack.len == 0 or indentStack[^1] != indentLevel:
+                addDiagnostic("Inconsistent dedent: expected indent level " &
+                    $indentStack[^1] & " but got " & $indentLevel)
+
+    while not isAtEnd():
+        let character = input[index]
+        
+        case character
+        of '(':
+            addToken(TokenKind.LeftRoundBracket, $character)
+            index.inc()
+        of ')':
+            addToken(TokenKind.RightRoundBracket, $character)
+            index.inc()
+        of '{':
+            addToken(TokenKind.LeftCurlyBracket, $character)
+            index.inc()
+        of '}':
+            addToken(TokenKind.RightCurlyBracket, $character)
+            index.inc()
+        of '[':
+            addToken(TokenKind.LeftSquareBracket, $character)
+            index.inc()
+        of ']':
+            addToken(TokenKind.RightSquareBracket, $character)
+            index.inc()
+        of ',':
+            addToken(TokenKind.Comma, $character)
+            index.inc()
+        of '.':
+            addToken(TokenKind.Dot, $character)
+            index.inc()
+        of ':':
+            addToken(TokenKind.Colon, $character)
+            index.inc()
+        of '-':
+            if index + 1 < input.len and isDigit(input[index + 1]):
+                index.inc()
+                number(true)
+            else:
+                addToken(TokenKind.Minus, $character)
+                index.inc()
+        of '+':
+            if index + 1 < input.len and isDigit(input[index + 1]):
+                index.inc()
+                number()
+            else:
+                addToken(TokenKind.Plus, $character)
+                index.inc()
+        of '*':
+            addToken(TokenKind.Asterisk, $character)
+            index.inc()
+        of '/':
+            addToken(TokenKind.Slash, $character)
+            index.inc()
+        of '$':
+            addToken(TokenKind.Dollar, $character)
+            index.inc()
+        of '?':
+            addToken(TokenKind.Question, $character)
+            index.inc()
+        of '&':
+            addToken(TokenKind.Ampersand, $character)
+            index.inc()
+        of '=':
+            addToken(TokenKind.Equal, $character)
+            index.inc()
+        of '>':
+            addToken(TokenKind.MoreThan, $character)
+            index.inc()
+        of '<':
+            addToken(TokenKind.LessThan, $character)
+            index.inc()
+        of '|':
+            addToken(TokenKind.Bar, $character)
+            index.inc()
+        of '#':
+            # Ignore single line comment
+            while not isAtEnd() and not (input[index] == '\n'):
+                index.inc()
+        of '_':
+            if index + 1 < input.len and input[index + 1] == '<':
+                index.inc(2)
+                addToken(TokenKind.UnderscoreLessThan, "_<")
+            else:
+                addToken(TokenKind.Underscore, $character)
+                index.inc()
+        of '\n':
+            line.inc()
+            index.inc()
+            # TODO: Only add newlines at the end of statements and not just everywhere
+            # TODO: Don't add newlines inside expressions
+            #addToken(TokenKind.Newline)
+            handleIndentation()
+        of ' ', '\\':
+            index.inc()
+        of '!':
+            if index + 1 < input.len:
+                if input[index + 1] == '=':
+                    addToken(TokenKind.ExclamationEqual, "!=")
+                    index.inc(2)
+                elif input[index + 1] == '>':
+                    addToken(TokenKind.ExclamationMoreThan, "!>")
+                    index.inc(2)
+                elif input[index + 1] == '<': 
+                    addToken(TokenKind.ExclamationLessThan, "!<")
+                    index.inc(2)
+            else: 
+                addToken(TokenKind.Exclamation, $character)
+                index.inc()
+        of '"':
+            string()
+        else:
+            if isDigit(character):
+                number()
+            elif isAlphabet(character):
+                identifier()
+            else:
+                addDiagnostic("Unexpected character: `" & $character & "`")
+                index.inc()
+
+    while indentStack.len > 1:  
+        indentStack.setLen(indentStack.len - 1)
+        addToken(TokenKind.Dedent)
+    
+    addToken(TokenKind.EndOfFile)
+    
+    return LexerOutput(
+        diagnostics: diagnostics, 
+        tokens: tokens
+    )
+
+
+
+
+# parser.nim
+
+import types, strutils, ../utilities/debugging
+
+proc parser*(lexerOutput: LexerOutput): ParserOutput =
+    var index = 0
+    var diagnostics: Diagnostics = lexerOutput.diagnostics
+    var tokens: Tokens = lexerOutput.tokens
+    var abstractSyntaxTree: Statements
+
+    proc isAtEnd(): bool =
+        return tokens[index].tokenKind == EndOfFile
+
+    proc isCurrentTokenKind(tokenKinds: varargs[TokenKind]): bool =
+        if isAtEnd(): 
+            return false
+        for tokenKind in tokenKinds:
+            if tokens[index].tokenKind == tokenKind:
+                return true
+        return false
+
+
+    proc expression(): Expression
+    proc statement(): Statement
+    
+    
+    proc primaryExpression(): Expression =
+        if isCurrentTokenKind(TokenKind.RightKeyword):
+            index.inc()            
+            return LiteralExpression(value: BooleanLiteral(value: true))
+        if isCurrentTokenKind(TokenKind.WrongKeyword):
+            index.inc()            
+            return LiteralExpression(value: BooleanLiteral(value: false))
+        if isCurrentTokenKind(TokenKind.StringLiteral):
+            index.inc()            
+            return LiteralExpression(value: StringLiteral(value: tokens[index].lexeme))
+        if isCurrentTokenKind(TokenKind.NumericLiteral):
+            index.inc()
+            return LiteralExpression(value: NumericLiteral(value: parseFloat(tokens[index - 1].lexeme)))
+        if isCurrentTokenKind(TokenKind.LeftRoundBracket):
+            index.inc()            
+            let expression: Expression = expression()
+            if tokens[index].tokenKind == TokenKind.RightRoundBracket: 
+                index.inc() 
+            else:
+                diagnostics.add(Diagnostic(diagnosticKind: DiagnosticKind.Parser, errorMessage: "Bro where is the `)` 🤔", line: tokens[index].line))
+                echo "Parser synchronisation is not available currently"
+                quit(1)
+            return GroupingExpression(expression: expression)
+
+
+ 
+    proc unaryExpression(): Expression =
+        if isCurrentTokenKind(TokenKind.Exclamation, TokenKind.Minus):
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = unaryExpression()
+            return UnaryExpression(operator: operator, right: right)
+            
+        return primaryExpression()
+    
+    proc factorExpression(): Expression =
+        var expression: Expression = unaryExpression()
+        
+        while isCurrentTokenKind(TokenKind.Asterisk, TokenKind.Slash):  
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = unaryExpression()
+            expression = BinaryExpression(left: expression, operator: operator, right: right)
+        
+        return expression
+    
+    
+    proc termExpression(): Expression =
+        var expression: Expression = factorExpression()
+
+        while isCurrentTokenKind(TokenKind.Plus, TokenKind.Minus):
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = factorExpression()
+            expression = BinaryExpression(left: expression, operator: operator, right: right)
+        
+        return expression
+    
+    
+    proc comparisonExpression(): Expression =
+        var expression: Expression = termExpression()
+        
+        while isCurrentTokenKind(TokenKind.MoreThan, TokenKind.LessThan, TokenKind.ExclamationMoreThan, TokenKind.ExclamationLessThan):
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = termExpression()
+            expression = BinaryExpression(left: expression, operator: operator, right: right)
+
+        return expression
+    
+    
+    proc equalityExpression(): Expression =
+        var expression: Expression = comparisonExpression()
+        
+        while isCurrentTokenKind(TokenKind.Equal, TokenKind.ExclamationEqual):
+            let operator: Token = tokens[index]
+            index.inc()
+            let right: Expression = comparisonExpression()
+            expression = BinaryExpression(left: expression, operator: operator, right: right)
+
+        return expression
+    
+    proc expression(): Expression =
+        return equalityExpression()
+    
+    proc expressionStatement(): Statement =
+        return ExpressionStatement(expression: expression())
+    
+    proc statement(): Statement =
+        return expressionStatement()
+
+    while not isAtEnd():
+        add abstractSyntaxTree, statement()
+    
+    return ParserOutput(
+        diagnostics: diagnostics,
+        abstractSyntaxTree: abstractSyntaxTree
+    )
+
+
+
+
+# generator.nim
+
+import types
+
+proc literalGenerator(literal: Literal): string =
+    if literal of NumericLiteral:
+        let literal: NumericLiteral = NumericLiteral(literal)
+        return $literal.value
+    elif literal of StringLiteral: 
+        let literal: StringLiteral = StringLiteral(literal)
+        return "\"" & literal.value & "\""
+    elif literal of BooleanLiteral: 
+        let literal: BooleanLiteral = BooleanLiteral(literal)
+        return $literal.value
+
+proc expressionGenerator(expression: Expression): string =
+    if expression of LiteralExpression:
+        let expression: LiteralExpression = LiteralExpression(expression)
+        return literalGenerator(expression.value)
+    elif expression of BinaryExpression:
+        let expression: BinaryExpression = BinaryExpression(expression)
+        return "(" & expressionGenerator(expression.left) & " " & expression.operator.lexeme & " " & expressionGenerator(expression.right) & ")"
+    elif expression of UnaryExpression:
+        let expression: UnaryExpression = UnaryExpression(expression)
+        return expression.operator.lexeme & expressionGenerator(expression.right)
+    elif expression of GroupingExpression:
+        let expression: GroupingExpression = GroupingExpression(expression)
+        return "(" & expressionGenerator(expression.expression) & ")"
+
+
+proc statementGenerator(statement: Statement): string =
+    if statement of ExpressionStatement:
+        let statement: ExpressionStatement = ExpressionStatement(statement)
+        return expressionGenerator(statement.expression)
+
+
+proc generator*(parserOutput: ParserOutput): string =
+    var output: string = ""
+    let abstractSyntaxTree: Statements = parserOutput.abstractSyntaxTree
+    
+    for statement in abstractSyntaxTree:
+        output &= statementGenerator(statement)
+    
+    return output
+
+
+
+
+
+
+
+# example of my language 
+
+is-prime num:
+    when num !> 1
+        exit wrong
+    then num = 2
+        exit right
+    then (remainder num, 2) = 0
+        exit wrong
+
+    loop 3_(power num, 0.5)_2 with i
+        when (remainder num, i) = 0
+            exit wrong
+
+    exit right
+
+
+print-prime num-1, num-2: 
+    write "Prime numbers from |num-1| to |num2| are:"
+    
+    loop num-1_num-2 with num
+        when is-prime num
+            write num
+
+
+num-1: to-number prompt "What is your 1st number" 
+num-2: to-number prompt "What is your 2nd number"
+
+print-prime num-1, num-2
+
+
+
+
+

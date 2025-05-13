@@ -9,11 +9,21 @@ import types
 
 
 proc lexer*(input: string): LexerOutput =
+    # Index of current character
     var index: int
+    
     var tokens: Tokens
+    
+    # List of errors that occur during lexical analysis 
     var diagnostics: Diagnostics
+    
+    # Line number 
     var line: int = 1
+    
+    # For managing indentation inside `handleIndentation` proc
     var indentStack = @[0]
+    
+    # For checking if an identifier is a keyword inside `identifier` proc
     const keywords = {
         "try": TokenKind.TryKeyword,
         "fix": TokenKind.FixKeyword,
@@ -26,6 +36,9 @@ proc lexer*(input: string): LexerOutput =
         "import": TokenKind.ImportKeyword,
         "export": TokenKind.ExportKeyword
     }.toTable
+    
+    var roundBracketStack: seq[int] = @[]
+    var squareBracketStack: seq[int] = @[]
     
     proc addToken(tokenKind: TokenKind, lexeme: string = "") =
         add tokens, Token(tokenKind: tokenKind, lexeme: lexeme, line: line)
@@ -87,8 +100,12 @@ proc lexer*(input: string): LexerOutput =
             index.inc()
         addToken(TokenKind.NumericLiteral, accumulate)
     
-    # I created this, but chatGPT fixed edge cases, so i don't know how it works, although it works
-    proc handleIndentation() =
+
+    proc newline() =
+        line.inc()
+        index.inc()
+        if roundBracketStack.len() != 0: return
+        
         var spaceCount = 0
     
         # Count leading spaces
@@ -97,9 +114,9 @@ proc lexer*(input: string): LexerOutput =
             index.inc()
     
         # Skip line if it's empty or contains only spaces
-        if isAtEnd() or input[index] == '\n':
+        if isAtEnd() or input[index] == '\n' or input[index] == '#':
             return
-    
+        
         # Indentation must be a multiple of 4
         if spaceCount mod 4 != 0:
             addDiagnostic("Indentation must be a multiple of 4 spaces")
@@ -115,26 +132,35 @@ proc lexer*(input: string): LexerOutput =
                     $(currentIndentLevel + 1) & " but got " & $indentLevel)
                 return
             indentStack.add(indentLevel)
-            addToken(TokenKind.Indent)
+            addToken(TokenKind.Indent, "++++")
     
         elif indentLevel < currentIndentLevel:
             # Dedent to known indentation level
+            
             while indentStack.len > 0 and indentStack[^1] > indentLevel:
                 indentStack.setLen(indentStack.len - 1)
-                addToken(TokenKind.Dedent)
+                addToken(TokenKind.Dedent, "----")
     
             if indentStack.len == 0 or indentStack[^1] != indentLevel:
                 addDiagnostic("Inconsistent dedent: expected indent level " &
                     $indentStack[^1] & " but got " & $indentLevel)
+            
+                                                 # out of bound check
+        elif indentLevel == currentIndentLevel and tokens.len() != 0 and tokens[^1].tokenKind notin {TokenKind.Indent, TokenKind.Dedent, TokenKind.Newline}:
+            addToken(TokenKind.Newline, "\n")
 
+    
+    
     while not isAtEnd():
         let character = input[index]
         
         case character
         of '(':
+            roundBracketStack.add(0)
             addToken(TokenKind.LeftRoundBracket, $character)
             index.inc()
         of ')':
+            discard roundBracketStack.pop()
             addToken(TokenKind.RightRoundBracket, $character)
             index.inc()
         of '{':
@@ -144,9 +170,11 @@ proc lexer*(input: string): LexerOutput =
             addToken(TokenKind.RightCurlyBracket, $character)
             index.inc()
         of '[':
+            squareBracketStack.add(0)
             addToken(TokenKind.LeftSquareBracket, $character)
             index.inc()
         of ']':
+            discard squareBracketStack.pop()
             addToken(TokenKind.RightSquareBracket, $character)
             index.inc()
         of ',':
@@ -211,12 +239,7 @@ proc lexer*(input: string): LexerOutput =
                 addToken(TokenKind.Underscore, $character)
                 index.inc()
         of '\n':
-            line.inc()
-            index.inc()
-            # TODO: Only add newlines at the end of statements and not just everywhere
-            # TODO: Don't add newlines inside expressions
-            #addToken(TokenKind.Newline)
-            handleIndentation()
+            newline()
         of ' ', '\\':
             index.inc()
         of '!':
@@ -254,6 +277,18 @@ proc lexer*(input: string): LexerOutput =
         diagnostics: diagnostics, 
         tokens: tokens
     )
+
+
+when isMainModule:
+    import json
+    
+    let input: string = readFile("./garbage/input.uki")
+    let output: LexerOutput = lexer(input)
+    writeFile("./garbage/output.js", pretty(%output, indent = 4))
+    
+
+    
+    
 
 
 

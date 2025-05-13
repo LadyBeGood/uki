@@ -24,7 +24,13 @@ proc expressionGenerator(expression: Expression): string =
         return literalGenerator(expression.value)
     elif expression of BinaryExpression:
         let expression: BinaryExpression = BinaryExpression(expression)
-        return "(" & expressionGenerator(expression.left) & " " & expression.operator.lexeme & " " & expressionGenerator(expression.right) & ")"
+        return "(" & expressionGenerator(expression.left) & " " & (
+            case expression.operator.lexeme
+            of "!<": ">="
+            of "!>": "<="
+            of "=": "==="
+            else: expression.operator.lexeme
+        ) & " " & expressionGenerator(expression.right) & ")"
     elif expression of UnaryExpression:
         let expression: UnaryExpression = UnaryExpression(expression)
         return expression.operator.lexeme & expressionGenerator(expression.right)
