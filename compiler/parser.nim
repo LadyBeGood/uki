@@ -41,9 +41,7 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
             index.inc()
         elif isCurrentTokenKind(TokenKind.Identifier):
             result = AccessingExpression(identifier: tokens[index].lexeme)
-            echo 1
             index.inc()
-            echo 2
         elif isCurrentTokenKind(TokenKind.LeftRoundBracket):
             index.inc()            
             result = GroupingExpression(expression: expression())
