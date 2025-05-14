@@ -1,8 +1,25 @@
-## Compile
-Entry point is `code/compiler/compiler.nim`
-```
-nim cpp --d:release --opt:speed --passC:-flto --outDir:garbage --verbosity:0 ./code/compiler/compiler.nim
-```
+## Installation
+
+### Prerequisites
+[Install Nim](https://nim-lang.org/install.html)
+
+### Steps
+1. Clone the GitHub repository
+    ```sh
+    git clone https://github.com/LadyBeGood/uki.git
+    ```
+2. Compile the code
+    ```sh
+    nim cpp --d:release --opt:speed --passC:-flto --out:ukic --verbosity:0 ./uki/compiler/compiler.nim
+    ```
+
+
+
+2. Compile a file:
+   ```sh
+   ./uki input.uki output.js
+   node output.js             # Run the output
+   ```
 
 ## License
 

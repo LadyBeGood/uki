@@ -113,6 +113,9 @@ type
     LiteralExpression* = ref object of Expression
         value*: Literal
     
+    AccessingExpression* = ref object of Expression
+        identifier*: string
+    
     # Literals
     Literal* = ref object of RootObj
     
@@ -133,7 +136,10 @@ type
     ExpressionStatement* = ref object of Statement
         expression*: Expression
 
-
+    DeclarationStatement* = ref object of Statement
+        identifier*: string
+        parameters*: seq[string]
+        value*: Expression
 
 
 

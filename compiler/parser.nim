@@ -16,8 +16,6 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
         return tokens[index].tokenKind == EndOfFile
 
     proc isCurrentTokenKind(tokenKinds: varargs[TokenKind]): bool =
-        if isAtEnd(): 
-            return false
         for tokenKind in tokenKinds:
             if tokens[index].tokenKind == tokenKind:
                 return true
@@ -30,27 +28,32 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
     
     proc primaryExpression(): Expression =
         if isCurrentTokenKind(TokenKind.RightKeyword):
+            result = LiteralExpression(value: BooleanLiteral(value: true))
             index.inc()            
-            return LiteralExpression(value: BooleanLiteral(value: true))
-        if isCurrentTokenKind(TokenKind.WrongKeyword):
+        elif isCurrentTokenKind(TokenKind.WrongKeyword):
+            result = LiteralExpression(value: BooleanLiteral(value: false))
             index.inc()            
-            return LiteralExpression(value: BooleanLiteral(value: false))
-        if isCurrentTokenKind(TokenKind.StringLiteral):
+        elif isCurrentTokenKind(TokenKind.StringLiteral):
+            result = LiteralExpression(value: StringLiteral(value: tokens[index].lexeme))
             index.inc()            
-            return LiteralExpression(value: StringLiteral(value: tokens[index].lexeme))
-        if isCurrentTokenKind(TokenKind.NumericLiteral):
+        elif isCurrentTokenKind(TokenKind.NumericLiteral):
+            result = LiteralExpression(value: NumericLiteral(value: parseFloat(tokens[index].lexeme)))
             index.inc()
-            return LiteralExpression(value: NumericLiteral(value: parseFloat(tokens[index - 1].lexeme)))
-        if isCurrentTokenKind(TokenKind.LeftRoundBracket):
+        elif isCurrentTokenKind(TokenKind.Identifier):
+            result = AccessingExpression(identifier: tokens[index].lexeme)
+            echo 1
+            index.inc()
+            echo 2
+        elif isCurrentTokenKind(TokenKind.LeftRoundBracket):
             index.inc()            
-            let expression: Expression = expression()
+            result = GroupingExpression(expression: expression())
+            
             if tokens[index].tokenKind == TokenKind.RightRoundBracket: 
                 index.inc() 
             else:
                 diagnostics.add(Diagnostic(diagnosticKind: DiagnosticKind.Parser, errorMessage: "Bro where is the `)` 🤔", line: tokens[index].line))
                 echo "Parser synchronisation is not available currently"
                 quit(1)
-            return GroupingExpression(expression: expression)
 
 
  
@@ -63,7 +66,7 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
             
         return primaryExpression()
     
-    proc factorExpression(): Expression =
+    proc multiplicationAndDivisionExpression(): Expression =
         var expression: Expression = unaryExpression()
         
         while isCurrentTokenKind(TokenKind.Asterisk, TokenKind.Slash):  
@@ -75,31 +78,31 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
         return expression
     
     
-    proc termExpression(): Expression =
-        var expression: Expression = factorExpression()
+    proc additionAndSubstractionExpression(): Expression =
+        var expression: Expression = multiplicationAndDivisionExpression()
 
         while isCurrentTokenKind(TokenKind.Plus, TokenKind.Minus):
             let operator: Token = tokens[index]
             index.inc()
-            let right: Expression = factorExpression()
+            let right: Expression = multiplicationAndDivisionExpression()
             expression = BinaryExpression(left: expression, operator: operator, right: right)
         
         return expression
     
     
     proc comparisonExpression(): Expression =
-        var expression: Expression = termExpression()
+        var expression: Expression = additionAndSubstractionExpression()
         
         while isCurrentTokenKind(TokenKind.MoreThan, TokenKind.LessThan, TokenKind.ExclamationMoreThan, TokenKind.ExclamationLessThan):
             let operator: Token = tokens[index]
             index.inc()
-            let right: Expression = termExpression()
+            let right: Expression = additionAndSubstractionExpression()
             expression = BinaryExpression(left: expression, operator: operator, right: right)
 
         return expression
     
     
-    proc equalityExpression(): Expression =
+    proc equalityAndInequalityExpression(): Expression =
         var expression: Expression = comparisonExpression()
         
         while isCurrentTokenKind(TokenKind.Equal, TokenKind.ExclamationEqual):
@@ -111,12 +114,46 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
         return expression
     
     proc expression(): Expression =
-        return equalityExpression()
+        return equalityAndInequalityExpression()
     
     proc expressionStatement(): Statement =
         return ExpressionStatement(expression: expression())
     
     proc statement(): Statement =
+        if isCurrentTokenKind(TokenKind.Identifier):
+            echo 3
+            var index2 = index
+            echo 4
+            let identifier = tokens[index2].lexeme
+            echo 5
+            index2.inc()
+            echo 6
+            var parameters: seq[string]
+            echo 7
+            
+            while tokens[index2].tokenKind == TokenKind.Identifier:
+                echo 9
+                if tokens[index2].tokenKind == TokenKind.Comma:
+                    echo 10
+                    index2.inc()
+                    echo 11
+                elif tokens[index2].tokenKind == TokenKind.Identifier:
+                    echo 12
+                    parameters.add(tokens[index2].lexeme)
+                    echo 13
+                    index2.inc()
+                    echo 14
+                else:
+                    echo 15
+                    break
+            echo 8
+            
+            if tokens[index2].tokenKind == TokenKind.Colon:
+                index2.inc()
+                index = index2
+                let value = expression()
+                return DeclarationStatement(identifier: identifier, parameters: parameters, value: value)
+        
         return expressionStatement()
 
     while not isAtEnd():

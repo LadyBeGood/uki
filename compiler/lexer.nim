@@ -37,7 +37,10 @@ proc lexer*(input: string): LexerOutput =
         "export": TokenKind.ExportKeyword
     }.toTable
     
+    # Make sure no newlines or indentation tokens are emitted inside expression
     var roundBracketStack: seq[int] = @[]
+    
+    # TODO
     var squareBracketStack: seq[int] = @[]
     
     proc addToken(tokenKind: TokenKind, lexeme: string = "") =

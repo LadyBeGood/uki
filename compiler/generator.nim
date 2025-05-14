@@ -37,10 +37,15 @@ proc expressionGenerator(expression: Expression): string =
     elif expression of GroupingExpression:
         let expression: GroupingExpression = GroupingExpression(expression)
         return "(" & expressionGenerator(expression.expression) & ")"
-
+    elif expression of AccessingExpression:
+        let expression: AccessingExpression = AccessingExpression(expression)
+        return expression.identifier
 
 proc statementGenerator(statement: Statement): string =
-    if statement of ExpressionStatement:
+    if statement of DeclarationStatement:
+        let statement: DeclarationStatement = DeclarationStatement(statement)
+        return "let " & statement.identifier & " = " & expressionGenerator(statement.value) & ";"
+    elif statement of ExpressionStatement:
         let statement: ExpressionStatement = ExpressionStatement(statement)
         return expressionGenerator(statement.expression)
 

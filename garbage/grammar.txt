@@ -5,37 +5,49 @@
 # See the license.txt file in the root of this repository.
 
 
-# TODO: Adding statements
-# TODO: Formatting
+program
+    statement*
 
+statement
+    | declaration-statement
+    | when-statement
+    | loop-statement
+
+declaration-statement
+    Identifier parameters? Colon
+
+parameters
+    Identifier (Comma Identifier)*
 
 
 
 expression 
-    equality
+    equality-and-inequality-expression
 
-equality
-    comparison ((ExclamationEqual | EqualEqual) comparison )*
+equality-and-inequality-expression
+    comparison-expression ((ExclamationEqual | EqualEqual) comparison-expression )*
 
-comparison
-    term ((MoreThan | ExclamationMoreThan | LessThan | ExclamationLessThan) term)*
+comparison-expression
+    addition-and-substraction-expression ((MoreThan | ExclamationMoreThan | LessThan | ExclamationLessThan) addition-and-substraction-expression)*
 
-term
-    factor ((Plus | Minus) factor)*
+addition-and-substraction-expression
+    multiplication-and-divison-expression ((Plus | Minus) multiplication-and-divison-expression)*
 
-factor
-    unary ((Slash | Asterisk) unary)*
+multiplication-and-divison-expression
+    unary-expression ((Slash | Asterisk) unary-expression)*
 
-unary
-    (Plus | Minus | Exclamation) unary | primary
+unary-expression
+    (Plus | Minus | Exclamation) unary-expression | primary-expression
     
-primary
-    | Number
-    | String 
+primary-expression
+    | NumericLiteral
+    | StringLitral
     | RightKeyword 
     | WrongKeyword 
+    | Identifier
     | LeftRoundBracket expression RightRoundBracket
     
+
 
 
 
