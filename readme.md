@@ -31,5 +31,3 @@ Utkrisht (uki) is licensed under the AGPL-3.0-or-later license. See the [license
 
 Copyright © 2025 Haha-jk
 
-utkrisht 
-nitkrisht
