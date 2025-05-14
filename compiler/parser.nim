@@ -4,7 +4,7 @@
 ## This file is part of Utkrisht and is licensed under the AGPL-3.0-or-later.
 ## See the license.txt file in the root of this repository.
 
-import types, strutils, utilities/debugging
+import types, strutils
 
 proc parser*(lexerOutput: LexerOutput): ParserOutput =
     var index = 0
@@ -121,32 +121,19 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
     
     proc statement(): Statement =
         if isCurrentTokenKind(TokenKind.Identifier):
-            echo 3
             var index2 = index
-            echo 4
             let identifier = tokens[index2].lexeme
-            echo 5
             index2.inc()
-            echo 6
             var parameters: seq[string]
-            echo 7
             
             while tokens[index2].tokenKind == TokenKind.Identifier:
-                echo 9
                 if tokens[index2].tokenKind == TokenKind.Comma:
-                    echo 10
                     index2.inc()
-                    echo 11
                 elif tokens[index2].tokenKind == TokenKind.Identifier:
-                    echo 12
                     parameters.add(tokens[index2].lexeme)
-                    echo 13
                     index2.inc()
-                    echo 14
                 else:
-                    echo 15
                     break
-            echo 8
             
             if tokens[index2].tokenKind == TokenKind.Colon:
                 index2.inc()
