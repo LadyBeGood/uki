@@ -131,7 +131,7 @@ proc lexer*(input: string): LexerOutput =
         if indentLevel > currentIndentLevel:
             # Only allow increasing by one level at a time
             if indentLevel != currentIndentLevel + 1:
-                addDiagnostic("Unexpected indent level: expected " &
+                addDiagnostic("Unexpected indent level, expected " &
                     $(currentIndentLevel + 1) & " but got " & $indentLevel)
                 return
             indentStack.add(indentLevel)
@@ -145,7 +145,7 @@ proc lexer*(input: string): LexerOutput =
                 addToken(TokenKind.Dedent, "----")
     
             if indentStack.len == 0 or indentStack[^1] != indentLevel:
-                addDiagnostic("Inconsistent dedent: expected indent level " &
+                addDiagnostic("Inconsistent dedent, expected indent level " &
                     $indentStack[^1] & " but got " & $indentLevel)
             
                                                  # out of bound check
@@ -267,7 +267,7 @@ proc lexer*(input: string): LexerOutput =
             elif isAlphabet(character):
                 identifier()
             else:
-                addDiagnostic("Unexpected character: `" & $character & "`")
+                addDiagnostic("Unexpected character, `" & $character & "`")
                 index.inc()
 
     while indentStack.len > 1:  

@@ -113,8 +113,13 @@ type
     LiteralExpression* = ref object of Expression
         value*: Literal
     
+    BlockExpression* = ref object of Expression
+        statements*: Statements
+        
     AccessingExpression* = ref object of Expression
         identifier*: string
+        arguments*: seq[Expression]
+
     
     # Literals
     Literal* = ref object of RootObj
@@ -141,5 +146,10 @@ type
         parameters*: seq[string]
         value*: Expression
 
-
+    WhenStatement* = ref object of Statement
+        branches*: seq[Branch]
+    
+    Branch* = ref object
+        condition*: Expression
+        `block`*: BlockExpression
 

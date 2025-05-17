@@ -5,7 +5,7 @@
 ## See the license.txt file in the root of this repository.
 
 
-import types
+import types, strutils
 
 proc literalGenerator(literal: Literal): string =
     if literal of NumericLiteral:
@@ -20,26 +20,37 @@ proc literalGenerator(literal: Literal): string =
 
 proc expressionGenerator(expression: Expression): string =
     if expression of LiteralExpression:
-        let expression: LiteralExpression = LiteralExpression(expression)
-        return literalGenerator(expression.value)
+        let expr = LiteralExpression(expression)
+        return literalGenerator(expr.value)
+
     elif expression of BinaryExpression:
-        let expression: BinaryExpression = BinaryExpression(expression)
-        return "(" & expressionGenerator(expression.left) & " " & (
-            case expression.operator.lexeme
+        let expr = BinaryExpression(expression)
+        let op = case expr.operator.lexeme
             of "!<": ">="
             of "!>": "<="
             of "=": "==="
-            else: expression.operator.lexeme
-        ) & " " & expressionGenerator(expression.right) & ")"
+            else: expr.operator.lexeme
+        return "(" & expressionGenerator(expr.left) & " " & op & " " & expressionGenerator(expr.right) & ")"
+
     elif expression of UnaryExpression:
-        let expression: UnaryExpression = UnaryExpression(expression)
-        return expression.operator.lexeme & expressionGenerator(expression.right)
+        let expr = UnaryExpression(expression)
+        return expr.operator.lexeme & expressionGenerator(expr.right)
+
     elif expression of GroupingExpression:
-        let expression: GroupingExpression = GroupingExpression(expression)
-        return "(" & expressionGenerator(expression.expression) & ")"
+        let expr = GroupingExpression(expression)
+        return "(" & expressionGenerator(expr.expression) & ")"
+
     elif expression of AccessingExpression:
-        let expression: AccessingExpression = AccessingExpression(expression)
-        return expression.identifier
+        let expr = AccessingExpression(expression)
+        if expr.arguments.len() != 0:
+            var args = ""
+            for i, arg in expr.arguments:
+                if i > 0:
+                    args &= ", "
+                args &= expressionGenerator(arg)
+            return expr.identifier & "(" & args & ")"
+        else:
+            return expr.identifier
 
 proc statementGenerator(statement: Statement): string =
     if statement of DeclarationStatement:
@@ -47,17 +58,45 @@ proc statementGenerator(statement: Statement): string =
         return "let " & statement.identifier & " = " & expressionGenerator(statement.value) & ";"
     elif statement of ExpressionStatement:
         let statement: ExpressionStatement = ExpressionStatement(statement)
-        return expressionGenerator(statement.expression)
+        return expressionGenerator(statement.expression) & ";"
+    elif statement of WhenStatement:
+        let statement: WhenStatement = WhenStatement(statement)
+        result = "if (" & expressionGenerator(statement.branches[0].condition) & ") {\n"
+        for s in statement.branches[0].`block`.statements:
+            result &= statementGenerator(s) & "\n"
+        result &= "}"
+        for i in 1 ..< statement.branches.len:
+            let branch = statement.branches[i]
+            result &= " else"
+            if branch.condition != nil:
+                result &= " if (" & expressionGenerator(branch.condition) & ")"
+            result &= " {\n"
+            for s in branch.`block`.statements:
+                result &= statementGenerator(s) & "\n"
+            result &= "}"
 
+
+
+proc diagnosticGenerator(diagnostic: Diagnostic): string =
+    if diagnostic.diagnosticKind == DiagnosticKind.Lexer:
+        return "Lexer error [line " & $diagnostic.line & "]: " & diagnostic.errorMessage
+    elif diagnostic.diagnosticKind == DiagnosticKind.Parser:
+        return "Parser error [line " & $diagnostic.line & "]: " & diagnostic.errorMessage
+        
 
 proc generator*(parserOutput: ParserOutput): string =
     var output: string = ""
-    let abstractSyntaxTree: Statements = parserOutput.abstractSyntaxTree
     
-    for statement in abstractSyntaxTree:
-        output &= statementGenerator(statement)
+    if parserOutput.diagnostics.len() != 0:
+        for diagnostic in parserOutput.diagnostics:
+            output &= diagnosticGenerator(diagnostic)
+        echo output
+    else:
+        for statement in parserOutput.abstractSyntaxTree:
+            output &= statementGenerator(statement)
     
     return output
+
 
 
 
