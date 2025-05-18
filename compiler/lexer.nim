@@ -5,18 +5,15 @@
 ## See the license.txt file in the root of this repository.
 
 import tables
-import types
+import types, error
 
 
-proc lexer*(input: string): LexerOutput =
+proc lexer*(input: string): Tokens =
     # Index of current character
     var index: int
     
     var tokens: Tokens
-    
-    # List of errors that occur during lexical analysis 
-    var diagnostics: Diagnostics
-    
+
     # Line number 
     var line: int = 1
     
@@ -46,9 +43,6 @@ proc lexer*(input: string): LexerOutput =
     proc addToken(tokenKind: TokenKind, lexeme: string = "") =
         add tokens, Token(tokenKind: tokenKind, lexeme: lexeme, line: line)
     
-    proc addDiagnostic(errorMessage: string) =
-        add diagnostics, Diagnostic(diagnosticKind: DiagnosticKind.Lexer, errorMessage: errorMessage, line: line)
-    
     proc isAtEnd(): bool =
         return index >= input.len
 
@@ -68,8 +62,7 @@ proc lexer*(input: string): LexerOutput =
         var accumulate = ""
         while true:
             if isAtEnd():
-                addDiagnostic("Unterminated string literal")
-                return
+                error(line, "Unterminated string")
     
             if input[index] == '"':
                 break
@@ -122,7 +115,7 @@ proc lexer*(input: string): LexerOutput =
         
         # Indentation must be a multiple of 4
         if spaceCount mod 4 != 0:
-            addDiagnostic("Indentation must be a multiple of 4 spaces")
+            error(line, "Indentation must be a multiple of 4 spaces")
             return
     
         let indentLevel = spaceCount div 4
@@ -131,21 +124,21 @@ proc lexer*(input: string): LexerOutput =
         if indentLevel > currentIndentLevel:
             # Only allow increasing by one level at a time
             if indentLevel != currentIndentLevel + 1:
-                addDiagnostic("Unexpected indent level, expected " &
+                error(line, "Unexpected indent level, expected " &
                     $(currentIndentLevel + 1) & " but got " & $indentLevel)
                 return
             indentStack.add(indentLevel)
-            addToken(TokenKind.Indent, "++++")
+            addToken(TokenKind.Indent, "indent")
     
         elif indentLevel < currentIndentLevel:
             # Dedent to known indentation level
             
             while indentStack.len > 0 and indentStack[^1] > indentLevel:
                 indentStack.setLen(indentStack.len - 1)
-                addToken(TokenKind.Dedent, "----")
+                addToken(TokenKind.Dedent, "dedent")
     
             if indentStack.len == 0 or indentStack[^1] != indentLevel:
-                addDiagnostic("Inconsistent dedent, expected indent level " &
+                error(line, "Inconsistent dedent, expected indent level " &
                     $indentStack[^1] & " but got " & $indentLevel)
             
                                                  # out of bound check
@@ -267,26 +260,22 @@ proc lexer*(input: string): LexerOutput =
             elif isAlphabet(character):
                 identifier()
             else:
-                addDiagnostic("Unexpected character, `" & $character & "`")
-                index.inc()
+                error(line, "Invalid character, `" & $character & "`")
 
     while indentStack.len > 1:  
         indentStack.setLen(indentStack.len - 1)
         addToken(TokenKind.Dedent)
     
-    addToken(TokenKind.EndOfFile)
+    addToken(TokenKind.EndOfFile, "File has ended")
     
-    return LexerOutput(
-        diagnostics: diagnostics, 
-        tokens: tokens
-    )
+    return tokens
 
 
 when isMainModule:
     import json
     
     let input: string = readFile("./garbage/input.uki")
-    let output: LexerOutput = lexer(input)
+    let output: Tokens = lexer(input)
     writeFile("./garbage/output.js", pretty(%output, indent = 4))
     
 

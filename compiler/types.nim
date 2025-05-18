@@ -63,11 +63,7 @@ type
         # Spacing  
         Indent  
         Dedent  
-    
-    DiagnosticKind* {.pure.} = enum
-        Lexer
-        Parser
-        Validator
+
 
     Token* = ref object  
         tokenKind*: TokenKind
@@ -76,21 +72,6 @@ type
     
     Tokens* = seq[Token]
     
-    Diagnostic* = ref object
-        diagnosticKind*: DiagnosticKind
-        errorMessage*: string
-        line*: int
-    
-    Diagnostics* = seq[Diagnostic]
-    
-    LexerOutput* = ref object
-        diagnostics*: Diagnostics
-        tokens*: Tokens
-
-    
-    ParserOutput* = object
-        diagnostics*: Diagnostics
-        abstractSyntaxTree*: Statements
 
 
 

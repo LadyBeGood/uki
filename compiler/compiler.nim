@@ -47,3 +47,5 @@ when isMainModule:
     except:
         styledEcho(fgRed, "Error: ", resetStyle, "Unexpected error during compilation")
         quit(1)
+
+

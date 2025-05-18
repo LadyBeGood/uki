@@ -81,23 +81,11 @@ proc statementGenerator(statement: Statement): string =
         
 
 
-proc diagnosticGenerator(diagnostic: Diagnostic): string =
-    if diagnostic.diagnosticKind == DiagnosticKind.Lexer:
-        return "Lexer error [line " & $diagnostic.line & "]: " & diagnostic.errorMessage
-    elif diagnostic.diagnosticKind == DiagnosticKind.Parser:
-        return "Parser error [line " & $diagnostic.line & "]: " & diagnostic.errorMessage
-        
-
-proc generator*(parserOutput: ParserOutput): string =
+proc generator*(abstractSyntaxTree: Statements): string =
     var output: string = ""
-    
-    if parserOutput.diagnostics.len() != 0:
-        for diagnostic in parserOutput.diagnostics:
-            output &= diagnosticGenerator(diagnostic)
-        echo output
-    else:
-        for statement in parserOutput.abstractSyntaxTree:
-            output &= statementGenerator(statement)
+
+    for statement in abstractSyntaxTree:
+        output &= statementGenerator(statement)
     
     return output
 

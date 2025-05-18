@@ -4,20 +4,15 @@
 ## This file is part of Utkrisht and is licensed under the AGPL-3.0-or-later.
 ## See the license.txt file in the root of this repository.
 
-import types, strutils
+import types, strutils, error
 
-proc parser*(lexerOutput: LexerOutput): ParserOutput =
+proc parser*(tokens: Tokens): Statements =
     var index = 0
-    var diagnostics: Diagnostics = lexerOutput.diagnostics
-    var tokens: Tokens = lexerOutput.tokens
+    var tokens: Tokens = tokens
     var abstractSyntaxTree: Statements
 
     proc isAtEnd(): bool =
         return tokens[index].tokenKind == EndOfFile
-
-    proc addDiagnostic(errorMessage: string) =
-        add diagnostics, Diagnostic(diagnosticKind: DiagnosticKind.Parser, errorMessage: errorMessage, line: tokens[index].line)
-    
 
     
     proc isCurrentTokenKind(tokenKinds: varargs[TokenKind]): bool =
@@ -26,21 +21,13 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
                 return true
         return false
     
-    proc synchronize() =
-        while not isAtEnd():
-            case tokens[index].tokenKind
-            of TokenKind.Newline, TokenKind.Indent, TokenKind.Dedent,
-               TokenKind.WhenKeyword, TokenKind.LoopKeyword:
-                return
-            else:
-                index.inc()
     
     proc expect(tokenKinds: varargs[TokenKind]) =
         for tokenKind in tokenKinds:
             if tokens[index].tokenKind == tokenKind:
                 return
-        addDiagnostic("Expected one of " & $tokenKinds & " but got " & $tokens[index].tokenKind)
-        raise newException(ParserError, "")
+        error(tokens[index].line, "Expected " & (if tokenKinds.len() == 1: $tokenKinds[0] else: "one of " & $tokenKinds) & " but got " & $tokens[index].tokenKind)
+
     
     
     proc expression(): Expression
@@ -51,11 +38,7 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
         var statements: Statements = @[]
         
         while not isAtEnd() and not isCurrentTokenKind(TokenKind.Dedent):
-            let statement: Statement = statement()
-            if statement == nil:
-                synchronize()
-            else:
-                statements.add(statement)
+            statements.add(statement())
         
         expect(TokenKind.Dedent)
         index.inc()
@@ -192,13 +175,17 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
     proc whenStatement(): Statement =
         index.inc()
         var clauses: seq[WhenClause] = @[]
-    
+        
+        expect(TokenKind.LeftRoundBracket, TokenKind.Identifier, TokenKind.NumericLiteral, TokenKind.StringLiteral, TokenKind.RightKeyword, TokenKind.WrongKeyword)
         let firstCondition: Expression = expression()
+        
+        expect(TokenKind.Indent)
         let firstBlock: BlockExpression = blockExpression()
         clauses.add(WhenClause(condition: firstCondition, `block`: firstBlock))
     
         while isCurrentTokenKind(TokenKind.ThenKeyword):
             index.inc()
+            expect(TokenKind.Indent, TokenKind.LeftRoundBracket, TokenKind.Identifier, TokenKind.NumericLiteral, TokenKind.StringLiteral, TokenKind.RightKeyword, TokenKind.WrongKeyword)
             var condition: Expression = nil
             if not isCurrentTokenKind(TokenKind.Indent):
                 condition = expression()
@@ -209,7 +196,6 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
         
     
     proc loopStatement(): Statement =
-        echo index # 0
         index.inc()
         var clauses: seq[LoopClause] = @[]
         while true:
@@ -223,7 +209,6 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
                     index.inc()
                     
             clauses.add(LoopClause(iterable: iterable, counters: counters))
-            echo index # 4
             if isCurrentTokenKind(TokenKind.Comma):
                 index.inc()
                 expect(TokenKind.NumericLiteral, TokenKind.Identifier, TokenKind.StringLiteral)
@@ -237,25 +222,20 @@ proc parser*(lexerOutput: LexerOutput): ParserOutput =
     
     
     proc statement(): Statement =
-        try:
-            if isCurrentTokenKind(TokenKind.WhenKeyword):
-                return whenStatement()
-            elif isCurrentTokenKind(TokenKind.LoopKeyword):
-                return loopStatement()
-            else:
-                return expressionStatement()
-        except ParserError:
-            synchronize()
+        if isCurrentTokenKind(TokenKind.WhenKeyword):
+            return whenStatement()
+        elif isCurrentTokenKind(TokenKind.LoopKeyword):
+            return loopStatement()
+        else:
+            return expressionStatement()
+
 
 
     while not isAtEnd():
         abstractSyntaxTree.add(statement())
         
     
-    return ParserOutput(
-        diagnostics: diagnostics,
-        abstractSyntaxTree: abstractSyntaxTree
-    )
+    return abstractSyntaxTree
 
 
 
