@@ -103,6 +103,12 @@ type
         operator*: Token
         right*: Expression
 
+    RangeExpression* = ref object of Expression
+        start*: Expression
+        stop*: Expression
+        step*: Expression
+        rangeType*: string
+    
     UnaryExpression* = ref object of Expression
         operator*: Token
         right*: Expression
@@ -147,9 +153,21 @@ type
         value*: Expression
 
     WhenStatement* = ref object of Statement
-        branches*: seq[Branch]
+        clauses*: seq[WhenClause]
     
-    Branch* = ref object
+    WhenClause* = ref object
         condition*: Expression
         `block`*: BlockExpression
+
+    LoopStatement* = ref object of Statement
+        clauses*: seq[LoopClause]
+        `block`*: BlockExpression
+
+    LoopClause* = ref object 
+        iterable*: Expression
+        counters*: seq[string]
+
+
+    # Error
+    ParserError* = object of CatchableError
 

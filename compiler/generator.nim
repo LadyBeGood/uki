@@ -5,7 +5,7 @@
 ## See the license.txt file in the root of this repository.
 
 
-import types, strutils
+import types
 
 proc literalGenerator(literal: Literal): string =
     if literal of NumericLiteral:
@@ -61,20 +61,24 @@ proc statementGenerator(statement: Statement): string =
         return expressionGenerator(statement.expression) & ";"
     elif statement of WhenStatement:
         let statement: WhenStatement = WhenStatement(statement)
-        result = "if (" & expressionGenerator(statement.branches[0].condition) & ") {\n"
-        for s in statement.branches[0].`block`.statements:
+        result = "if (" & expressionGenerator(statement.clauses[0].condition) & ") {\n"
+        for s in statement.clauses[0].`block`.statements:
             result &= statementGenerator(s) & "\n"
         result &= "}"
-        for i in 1 ..< statement.branches.len:
-            let branch = statement.branches[i]
+        for i in 1 ..< statement.clauses.len:
+            let clause = statement.clauses[i]
             result &= " else"
-            if branch.condition != nil:
-                result &= " if (" & expressionGenerator(branch.condition) & ")"
+            if clause.condition != nil:
+                result &= " if (" & expressionGenerator(clause.condition) & ")"
             result &= " {\n"
-            for s in branch.`block`.statements:
+            for s in clause.`block`.statements:
                 result &= statementGenerator(s) & "\n"
             result &= "}"
-
+    
+    elif statement of LoopStatement:
+        #let statement: LoopStatement = LoopStatement(statement)
+        return "LOOP"
+        
 
 
 proc diagnosticGenerator(diagnostic: Diagnostic): string =

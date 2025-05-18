@@ -1,7 +1,18 @@
-if (10.0) {
-20.0;
-} else if (20.0) {
-30.0;
-} else {
-40.0;
+
+
+fun name() 
+    var a = 1;
+    while (a < 10) {
+        print a;
+        a = a + 1;
+    }
 }
+
+var condition = 20 > 30;
+if (condition) 
+  print "yes";
+} else {
+  print "no";
+}
+
+
