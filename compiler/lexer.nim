@@ -128,14 +128,14 @@ proc lexer*(input: string): Tokens =
                     $(currentIndentLevel + 1) & " but got " & $indentLevel)
                 return
             indentStack.add(indentLevel)
-            addToken(TokenKind.Indent, "indent")
+            addToken(TokenKind.Indent, "++++")
     
         elif indentLevel < currentIndentLevel:
             # Dedent to known indentation level
             
             while indentStack.len > 0 and indentStack[^1] > indentLevel:
                 indentStack.setLen(indentStack.len - 1)
-                addToken(TokenKind.Dedent, "dedent")
+                addToken(TokenKind.Dedent, "----")
     
             if indentStack.len == 0 or indentStack[^1] != indentLevel:
                 error(line, "Inconsistent dedent, expected indent level " &
@@ -264,7 +264,7 @@ proc lexer*(input: string): Tokens =
 
     while indentStack.len > 1:  
         indentStack.setLen(indentStack.len - 1)
-        addToken(TokenKind.Dedent)
+        addToken(TokenKind.Dedent, "----")
     
     addToken(TokenKind.EndOfFile, "File has ended")
     

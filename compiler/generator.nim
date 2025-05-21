@@ -40,8 +40,8 @@ proc expressionGenerator(expression: Expression): string =
         let expr = GroupingExpression(expression)
         return "(" & expressionGenerator(expr.expression) & ")"
 
-    elif expression of AccessingExpression:
-        let expr = AccessingExpression(expression)
+    elif expression of ContainerExpression:
+        let expr = ContainerExpression(expression)
         if expr.arguments.len() != 0:
             var args = ""
             for i, arg in expr.arguments:
@@ -53,20 +53,20 @@ proc expressionGenerator(expression: Expression): string =
             return expr.identifier
 
 proc statementGenerator(statement: Statement): string =
-    if statement of DeclarationStatement:
-        let statement: DeclarationStatement = DeclarationStatement(statement)
-        return "let " & statement.identifier & " = " & expressionGenerator(statement.value) & ";"
+    if statement of ContainerStatement:
+        let statement: ContainerStatement = ContainerStatement(statement)
+        return "let " & statement.identifier & " = " & expressionGenerator(statement.expression) & ";"
     elif statement of ExpressionStatement:
         let statement: ExpressionStatement = ExpressionStatement(statement)
         return expressionGenerator(statement.expression) & ";"
-    elif statement of WhenStatement:
-        let statement: WhenStatement = WhenStatement(statement)
-        result = "if (" & expressionGenerator(statement.clauses[0].condition) & ") {\n"
-        for s in statement.clauses[0].`block`.statements:
+    elif statement of WhenThenStatement:
+        let statement: WhenThenStatement = WhenThenStatement(statement)
+        result = "if (" & expressionGenerator(statement.whenThenSubStatements[0].condition) & ") {\n"
+        for s in statement.whenThenSubStatements[0].`block`.statements:
             result &= statementGenerator(s) & "\n"
         result &= "}"
-        for i in 1 ..< statement.clauses.len:
-            let clause = statement.clauses[i]
+        for i in 1 ..< statement.whenThenSubStatements.len():
+            let clause = statement.whenThenSubStatements[i]
             result &= " else"
             if clause.condition != nil:
                 result &= " if (" & expressionGenerator(clause.condition) & ")"
@@ -75,7 +75,7 @@ proc statementGenerator(statement: Statement): string =
                 result &= statementGenerator(s) & "\n"
             result &= "}"
     
-    elif statement of LoopStatement:
+    elif statement of LoopWithStatement:
         #let statement: LoopStatement = LoopStatement(statement)
         return "LOOP"
         

@@ -103,11 +103,34 @@ type
     BlockExpression* = ref object of Expression
         statements*: Statements
         
-    AccessingExpression* = ref object of Expression
+    ContainerExpression* = ref object of Expression
         identifier*: string
         arguments*: seq[Expression]
 
+    WhenThenExpression* = ref object of Expression
+        whenThenSubExpressions*: seq[WhenThenSubExpression]
     
+    WhenThenSubExpression* = ref object
+        condition*: Expression
+        expression*: Expression
+    
+    LoopWithExpression* = ref object of Expression
+        loopWithSubExpressions*: seq[LoopWithSubExpression]
+        expression*: Expression
+    
+    LoopWithSubExpression* = ref object
+        iterable*: Expression
+        counters*: seq[string]
+    
+    TryFixExpression* = ref object of Expression
+        tryExpression*: Expression
+        tryFixSubExpressions*: seq[TryFixSubExpression]
+    
+    TryFixSubExpression* = ref object
+        identifier*: string
+        fixExpression*: Expression
+
+
     # Literals
     Literal* = ref object of RootObj
     
@@ -128,27 +151,34 @@ type
     ExpressionStatement* = ref object of Statement
         expression*: Expression
 
-    DeclarationStatement* = ref object of Statement
+    ContainerStatement* = ref object of Statement
         identifier*: string
         parameters*: seq[string]
-        value*: Expression
+        expression*: Expression
 
-    WhenStatement* = ref object of Statement
-        clauses*: seq[WhenClause]
+    WhenThenStatement* = ref object of Statement
+        whenThenSubStatements*: seq[WhenThenSubStatement]
     
-    WhenClause* = ref object
+    WhenThenSubStatement* = ref object
         condition*: Expression
         `block`*: BlockExpression
 
-    LoopStatement* = ref object of Statement
-        clauses*: seq[LoopClause]
+    LoopWithStatement* = ref object of Statement
+        loopWithSubStatements*: seq[LoopWithSubStatement]
         `block`*: BlockExpression
 
-    LoopClause* = ref object 
+    LoopWithSubStatement* = ref object 
         iterable*: Expression
         counters*: seq[string]
 
+    TryFixStatement* = ref object of Statement
+        tryBlock*: BlockExpression
+        tryFixSubStatements*: seq[TryFixSubStatement]
+    
+    TryFixSubStatement* = ref object
+        identifier*: string
+        fixBlock*: BlockExpression
 
-    # Error
-    ParserError* = object of CatchableError
+
+
 

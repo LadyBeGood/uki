@@ -22,13 +22,24 @@ proc parser*(tokens: Tokens): Statements =
         return false
     
     
+    proc isCurrentTokenExpressionStart(): bool =
+        return isCurrentTokenKind(
+            TokenKind.NumericLiteral,
+            TokenKind.StringLiteral,
+            TokenKind.RightKeyword,
+            TokenKind.WrongKeyword,
+            TokenKind.Identifier,
+            TokenKind.LeftRoundBracket
+        )
+    
     proc expect(tokenKinds: varargs[TokenKind]) =
-        for tokenKind in tokenKinds:
-            if tokens[index].tokenKind == tokenKind:
-                return
+        if isCurrentTokenKind(tokenKinds):
+            return
         error(tokens[index].line, "Expected " & (if tokenKinds.len() == 1: $tokenKinds[0] else: "one of " & $tokenKinds) & " but got " & $tokens[index].tokenKind)
 
-
+    proc ignore(tokenKinds: varargs[TokenKind]) =
+        if isCurrentTokenKind(tokenKinds):
+            index.inc()
     
     proc expression(): Expression
     proc statement(): Statement
@@ -47,19 +58,6 @@ proc parser*(tokens: Tokens): Statements =
         elif isCurrentTokenKind(TokenKind.NumericLiteral):
             result = LiteralExpression(value: NumericLiteral(value: parseFloat(tokens[index].lexeme)))
             index.inc()
-        elif isCurrentTokenKind(TokenKind.Identifier):
-            let identifier: string = tokens[index].lexeme
-            index.inc()
-            var arguments: seq[Expression] = @[]
-            
-            while isCurrentTokenKind(TokenKind.NumericLiteral, TokenKind.StringLiteral, TokenKind.RightKeyword, TokenKind.WrongKeyword, TokenKind.Identifier, TokenKind.LeftRoundBracket):
-                arguments.add(expression())
-                if isCurrentTokenKind(TokenKind.Comma): 
-                    index.inc()
-                else:
-                    break
-                
-            result = AccessingExpression(identifier: identifier, arguments: arguments)
         elif isCurrentTokenKind(TokenKind.LeftRoundBracket):
             index.inc()            
             result = GroupingExpression(expression: expression())
@@ -149,12 +147,89 @@ proc parser*(tokens: Tokens): Statements =
         return expression
     
     proc containerExpression(): Expression =
+        let identifier: string = tokens[index].lexeme
+        index.inc()
         
+        var arguments: seq[Expression]
+        while isCurrentTokenExpressionStart():
+            arguments.add(expression())
+            if isCurrentTokenKind(TokenKind.Comma): 
+                index.inc()
+            else:
+                break
+    
+        return ContainerExpression(identifier: identifier, arguments: arguments)
+        
+    
     proc whenExpression(): Expression =
+        index.inc()
+        var whenThenSubExpressions: seq[WhenThenSubExpression] = @[]
         
+        let firstCondition: Expression = expression()
+        
+        expect(TokenKind.Colon)
+        ignore(TokenKind.Indent)
+        
+        let firstExpression: Expression = expression()
+        whenThenSubExpressions.add(WhenThenSubExpression(condition: firstCondition, expression: firstExpression))
+    
+        while isCurrentTokenKind(TokenKind.ThenKeyword):
+            index.inc()
+            var condition: Expression = nil
+            if not isCurrentTokenKind(TokenKind.Colon):
+                condition = expression()
+            let expression: Expression = expression()
+            whenThenSubExpressions.add(WhenThenSubExpression(condition: condition, expression: expression))
+
+        return WhenThenExpression(whenThenSubExpressions: whenThenSubExpressions)
+        
+    
     proc loopExpression(): Expression =
+        index.inc()
+        var loopWithSubExpressions: seq[LoopWithSubExpression] = @[]
+        while isCurrentTokenExpressionStart():
+            let iterable: Expression = expression()
+            var counters: seq[string] = @[]
+            if isCurrentTokenKind(TokenKind.WithKeyword):
+                index.inc()
+                expect(TokenKind.Identifier)
+                while isCurrentTokenKind(TokenKind.Identifier):
+                    counters.add(tokens[index].lexeme)
+                    index.inc()
+                    
+            loopWithSubExpressions.add(LoopWithSubExpression(iterable: iterable, counters: counters))
+            if isCurrentTokenKind(TokenKind.Comma):
+                index.inc()
+            else:
+                break
         
+        expect(TokenKind.Colon)
+        ignore(TokenKind.Indent)
+        let expression: Expression = expression()
+        return LoopWithExpression(loopWithSubExpressions: loopWithSubExpressions, expression: expression)
+
+
     proc tryExpression(): Expression =
+        index.inc()
+        expect(TokenKind.Colon)
+        ignore(TokenKind.Indent)
+        
+        let tryExpression: Expression = expression()
+        
+        var tryFixSubExpressions: seq[TryFixSubExpression] = @[]
+        
+        while isCurrentTokenKind(TokenKind.FixKeyword):
+            index.inc()
+            var identifier: string = ""
+            if not isCurrentTokenKind(TokenKind.Colon):
+                expect(TokenKind.Identifier)
+                identifier = tokens[index].lexeme
+            ignore(TokenKind.Indent)
+            let fixExpression: Expression = expression()
+            tryFixSubExpressions.add(TryFixSubExpression(identifier: identifier, fixExpression: fixExpression))
+
+        return TryFixExpression(tryExpression: tryExpression, tryFixSubExpressions: tryFixSubExpressions)
+
     
     proc blockExpression(): BlockExpression =
         index.inc()            
@@ -194,16 +269,37 @@ proc parser*(tokens: Tokens): Statements =
             index.inc()
     
     proc containerStatement(): Statement =
+        let identifier: string = tokens[index].lexeme
+        index.inc()
+        
+        var parameters: seq[string]
+        while isCurrentTokenKind(TokenKind.Identifier):
+            parameters.add(tokens[index].lexeme)
+            index.inc()
+        
+            if isCurrentTokenKind(TokenKind.Comma):
+                index.inc()
+            else:
+                break
+        
+        expect(TokenKind.Colon)
+        index.inc()
+        if parameters.len() != 0:
+            expect(TokenKind.Indent)
+        let expression: Expression = expression()
+        
+        return ContainerStatement(identifier: identifier, parameters: parameters, expression: expression)
+
     
     proc whenStatement(): Statement =
         index.inc()
-        var clauses: seq[WhenClause] = @[]
+        var whenThenSubStatements: seq[WhenThenSubStatement] = @[]
         
         let firstCondition: Expression = expression()
         
         expect(TokenKind.Indent)
         let firstBlock: BlockExpression = blockExpression()
-        clauses.add(WhenClause(condition: firstCondition, `block`: firstBlock))
+        whenThenSubStatements.add(WhenThenSubStatement(condition: firstCondition, `block`: firstBlock))
     
         while isCurrentTokenKind(TokenKind.ThenKeyword):
             index.inc()
@@ -211,15 +307,15 @@ proc parser*(tokens: Tokens): Statements =
             if not isCurrentTokenKind(TokenKind.Indent):
                 condition = expression()
             let `block`: BlockExpression = blockExpression()
-            clauses.add(WhenClause(condition: condition, `block`: `block`))
+            whenThenSubStatements.add(WhenThenSubStatement(condition: condition, `block`: `block`))
 
-        return WhenStatement(clauses: clauses)
+        return WhenThenStatement(whenThenSubStatements: whenThenSubStatements)
         
     
     proc loopStatement(): Statement =
         index.inc()
-        var clauses: seq[LoopClause] = @[]
-        while true:
+        var loopWithSubStatements: seq[LoopWithSubStatement] = @[]
+        while isCurrentTokenExpressionStart():
             let iterable: Expression = expression()
             var counters: seq[string] = @[]
             if isCurrentTokenKind(TokenKind.WithKeyword):
@@ -229,7 +325,7 @@ proc parser*(tokens: Tokens): Statements =
                     counters.add(tokens[index].lexeme)
                     index.inc()
                     
-            clauses.add(LoopClause(iterable: iterable, counters: counters))
+            loopWithSubStatements.add(LoopWithSubStatement(iterable: iterable, counters: counters))
             if isCurrentTokenKind(TokenKind.Comma):
                 index.inc()
             else:
@@ -237,9 +333,28 @@ proc parser*(tokens: Tokens): Statements =
         
         expect(TokenKind.Indent)
         let `block` = blockExpression()
-        return LoopStatement(clauses: clauses, `block`: `block`)
+        return LoopWithStatement(loopWithSubStatements: loopWithSubStatements, `block`: `block`)
+
+
+    proc tryFixStatement(): Statement =
+        index.inc()
+        expect(TokenKind.Indent)
+        let tryBlock: BlockExpression = blockExpression()
         
-    proc tryStatement(): Statement =
+        var tryFixSubStatements: seq[TryFixSubStatement] = @[]
+        
+        while isCurrentTokenKind(TokenKind.FixKeyword):
+            index.inc()
+            var identifier: string = ""
+            if not isCurrentTokenKind(TokenKind.Indent):
+                expect(TokenKind.Identifier)
+                identifier = tokens[index].lexeme
+            let fixBlock: BlockExpression = blockExpression()
+            tryFixSubStatements.add(TryFixSubStatement(identifier: identifier, fixBlock: fixBlock))
+
+        return TryFixStatement(tryBlock: tryBlock, tryFixSubStatements: tryFixSubStatements)
+
+    
     
     proc statement(): Statement =
         if isCurrentTokenKind(TokenKind.Identifier):
@@ -249,7 +364,7 @@ proc parser*(tokens: Tokens): Statements =
         elif isCurrentTokenKind(TokenKind.LoopKeyword):
             return loopStatement()
         elif isCurrentTokenKind(TokenKind.TryKeyword):
-            return tryStatement()
+            return tryFixStatement()
         else:
             return expressionStatement()
 
