@@ -15,3 +15,9 @@ macro shout*(args: varargs[untyped]): untyped =
         )
 
 
+macro bench*(name: string, body: untyped): untyped =
+    quote do:
+        let start = cpuTime()
+        `body`
+        let duration = cpuTime() - start
+        echo "Benchmark '", `name`, "' took ", duration, " seconds"

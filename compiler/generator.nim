@@ -20,37 +20,54 @@ proc literalGenerator(literal: Literal): string =
 
 proc expressionGenerator(expression: Expression): string =
     if expression of LiteralExpression:
-        let expr = LiteralExpression(expression)
-        return literalGenerator(expr.value)
+        let expression = LiteralExpression(expression)
+        return literalGenerator(expression.value)
 
     elif expression of BinaryExpression:
-        let expr = BinaryExpression(expression)
-        let op = case expr.operator.lexeme
+        let expression = BinaryExpression(expression)
+        let operator = case expression.operator.lexeme
             of "!<": ">="
             of "!>": "<="
             of "=": "==="
-            else: expr.operator.lexeme
-        return "(" & expressionGenerator(expr.left) & " " & op & " " & expressionGenerator(expr.right) & ")"
+            else: expression.operator.lexeme
+        return "(" & expressionGenerator(expression.left) & " " & operator & " " & expressionGenerator(expression.right) & ")"
 
     elif expression of UnaryExpression:
-        let expr = UnaryExpression(expression)
-        return expr.operator.lexeme & expressionGenerator(expr.right)
+        let expression = UnaryExpression(expression)
+        return expression.operator.lexeme & expressionGenerator(expression.right)
 
     elif expression of GroupingExpression:
-        let expr = GroupingExpression(expression)
-        return "(" & expressionGenerator(expr.expression) & ")"
+        let expression = GroupingExpression(expression)
+        return "(" & expressionGenerator(expression.expression) & ")"
 
     elif expression of ContainerExpression:
-        let expr = ContainerExpression(expression)
-        if expr.arguments.len() != 0:
+        let expression = ContainerExpression(expression)
+        if expression.arguments.len() != 0:
             var args = ""
-            for i, arg in expr.arguments:
+            for i, arg in expression.arguments:
                 if i > 0:
                     args &= ", "
                 args &= expressionGenerator(arg)
-            return expr.identifier & "(" & args & ")"
+            return expression.identifier & "(" & args & ")"
         else:
-            return expr.identifier
+            return expression.identifier
+    elif expression of WhenThenExpression:
+        let expression = WhenThenExpression(expression)
+        var output = "(() => {"
+        for i, subExpression in expression.whenThenSubExpressions:
+            let condition = subExpression.condition
+            let expression = expressionGenerator(subExpression.expression)
+            if condition.isNil:
+                output &= "else return " & expression & ";"
+            else:
+                let conditionCode = expressionGenerator(condition)
+                if i == 0:
+                    output &= "if (" & conditionCode & ") return " & expression & ";"
+                else:
+                    output &= "else if (" & conditionCode & ") return " & expression & ";"
+        output &= "})()"
+        return output
+
 
 proc statementGenerator(statement: Statement): string =
     if statement of ContainerStatement:

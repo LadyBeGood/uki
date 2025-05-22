@@ -1,8 +1,1 @@
-
-
-when declared
-    "Haha" 
-then
-    "Lala"
-
-
+name: 2 + (when condition1: 4 then condition2: 8 then: 10) * 6

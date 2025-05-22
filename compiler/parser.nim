@@ -6,6 +6,10 @@
 
 import types, strutils, error
 
+
+
+
+
 proc parser*(tokens: Tokens): Statements =
     var index = 0
     var tokens: Tokens = tokens
@@ -40,6 +44,28 @@ proc parser*(tokens: Tokens): Statements =
     proc ignore(tokenKinds: varargs[TokenKind]) =
         if isCurrentTokenKind(tokenKinds):
             index.inc()
+    
+    
+    proc isThisExpressionStatement(): bool =
+        var temp: int = index
+        while tokens[temp].tokenKind notin {TokenKind.Indent, TokenKind.EndOfFile}:
+            if tokens[temp].tokenKind == TokenKind.Colon:
+                return true
+            temp.inc()
+        return false
+    
+    proc isThisExpressionStatement2(): bool =
+        var temp: int = index
+        if tokens[temp + 1].tokenKind == TokenKind.Colon: return false
+        while tokens[temp].tokenKind notin {TokenKind.EndOfFile}:
+            if tokens[temp].tokenKind == TokenKind.Colon and tokens[temp + 1].tokenKind == TokenKind.Indent:
+                return false
+            if tokens[temp].tokenKind in {TokenKind.Newline, TokenKind.Dedent}:
+                return true
+            temp.inc()
+        # if reached end of file
+        return true
+    
     
     proc expression(): Expression
     proc statement(): Statement
@@ -161,13 +187,15 @@ proc parser*(tokens: Tokens): Statements =
         return ContainerExpression(identifier: identifier, arguments: arguments)
         
     
-    proc whenExpression(): Expression =
+    proc whenThenExpression(): Expression =
         index.inc()
         var whenThenSubExpressions: seq[WhenThenSubExpression] = @[]
+        
         
         let firstCondition: Expression = expression()
         
         expect(TokenKind.Colon)
+        index.inc()
         ignore(TokenKind.Indent)
         
         let firstExpression: Expression = expression()
@@ -178,13 +206,14 @@ proc parser*(tokens: Tokens): Statements =
             var condition: Expression = nil
             if not isCurrentTokenKind(TokenKind.Colon):
                 condition = expression()
+            index.inc()
             let expression: Expression = expression()
             whenThenSubExpressions.add(WhenThenSubExpression(condition: condition, expression: expression))
 
         return WhenThenExpression(whenThenSubExpressions: whenThenSubExpressions)
         
     
-    proc loopExpression(): Expression =
+    proc loopWithExpression(): Expression =
         index.inc()
         var loopWithSubExpressions: seq[LoopWithSubExpression] = @[]
         while isCurrentTokenExpressionStart():
@@ -209,7 +238,7 @@ proc parser*(tokens: Tokens): Statements =
         return LoopWithExpression(loopWithSubExpressions: loopWithSubExpressions, expression: expression)
 
 
-    proc tryExpression(): Expression =
+    proc tryFixExpression(): Expression =
         index.inc()
         expect(TokenKind.Colon)
         ignore(TokenKind.Indent)
@@ -251,11 +280,11 @@ proc parser*(tokens: Tokens): Statements =
         if isCurrentTokenKind(TokenKind.Identifier):
             return containerExpression()
         elif isCurrentTokenKind(TokenKind.WhenKeyword):
-            return whenExpression()
+            return whenThenExpression()
         elif isCurrentTokenKind(TokenKind.LoopKeyword):
-            return loopExpression()
+            return loopWithExpression()
         elif isCurrentTokenKind(TokenKind.TryKeyword):
-            return tryExpression()
+            return tryFixExpression()
         elif isCurrentTokenKind(TokenKind.Indent):
             return blockExpression()
         else:
@@ -265,10 +294,11 @@ proc parser*(tokens: Tokens): Statements =
     proc expressionStatement(): Statement =
         result = ExpressionStatement(expression: expression())
         expect(TokenKind.Newline, TokenKind.Dedent, TokenKind.EndOfFile)
-        if isCurrentTokenKind(TokenKind.Newline): 
-            index.inc()
+        ignore(TokenKind.Newline)
     
     proc containerStatement(): Statement =
+        if isThisExpressionStatement2(): return expressionStatement()
+        echo 56
         let identifier: string = tokens[index].lexeme
         index.inc()
         
@@ -291,7 +321,9 @@ proc parser*(tokens: Tokens): Statements =
         return ContainerStatement(identifier: identifier, parameters: parameters, expression: expression)
 
     
-    proc whenStatement(): Statement =
+    proc whenThenStatement(): Statement =
+        if isThisExpressionStatement(): return expressionStatement()
+        
         index.inc()
         var whenThenSubStatements: seq[WhenThenSubStatement] = @[]
         
@@ -312,7 +344,9 @@ proc parser*(tokens: Tokens): Statements =
         return WhenThenStatement(whenThenSubStatements: whenThenSubStatements)
         
     
-    proc loopStatement(): Statement =
+    proc loopWithStatement(): Statement =
+        if isThisExpressionStatement(): return expressionStatement()
+        
         index.inc()
         var loopWithSubStatements: seq[LoopWithSubStatement] = @[]
         while isCurrentTokenExpressionStart():
@@ -337,6 +371,8 @@ proc parser*(tokens: Tokens): Statements =
 
 
     proc tryFixStatement(): Statement =
+        if isThisExpressionStatement(): return expressionStatement()
+        
         index.inc()
         expect(TokenKind.Indent)
         let tryBlock: BlockExpression = blockExpression()
@@ -360,9 +396,9 @@ proc parser*(tokens: Tokens): Statements =
         if isCurrentTokenKind(TokenKind.Identifier):
             return containerStatement()
         elif isCurrentTokenKind(TokenKind.WhenKeyword):
-            return whenStatement()
+            return whenThenStatement()
         elif isCurrentTokenKind(TokenKind.LoopKeyword):
-            return loopStatement()
+            return loopWithStatement()
         elif isCurrentTokenKind(TokenKind.TryKeyword):
             return tryFixStatement()
         else:
@@ -375,6 +411,8 @@ proc parser*(tokens: Tokens): Statements =
         
     
     return abstractSyntaxTree
+
+
 
 
 
