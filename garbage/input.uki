@@ -1,1 +1,29 @@
-name: 2 + (when condition1: 4 then condition2: 8 then: 10) * 6
+is-prime num:
+    when num !> 1
+        exit wrong
+    then num = 2
+        exit right
+    then (remainder num, 2) = 0
+        exit wrong
+
+    loop 3_(power num, 0.5)_2 with i
+        when (remainder num, i) = 0
+            exit wrong
+
+    exit right
+
+
+print-prime num-1, num-2: 
+    write "Prime numbers from |num-1| to |num2| are:"
+    
+    loop num-1_num-2 with num
+        when is-prime num
+            write num
+
+
+num-1: to-number prompt "What is your 1st number" 
+num-2: to-number prompt "What is your 2nd number"
+
+print-prime num-1, num-2
+
+

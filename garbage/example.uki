@@ -1,10 +1,16 @@
+## Utkrisht - the Utkrisht programming language
+## Copyright (C) 2025 LadyBeGood
+##
+## This file is part of Utkrisht and is licensed under the AGPL-3.0-or-later.
+## See the license.txt file in the root of this repository.
+
 
 is-prime num:
     when num !> 1
         exit wrong
-    then num = 2
+    else num = 2
         exit right
-    then (remainder num, 2) = 0
+    else (remainder num, 2) = 0
         exit wrong
 
     loop 3_(power num, 0.5)_2 with i
@@ -14,8 +20,8 @@ is-prime num:
     exit right
 
 
-print-prime num-1, num-2: 
-    write "Prime numbers from |num-1| to |num2| are:"
+print-primes num-1, num-2: 
+    write "Prime numbers from |num-1| to |num-2| are:"
     
     loop num-1_num-2 with num
         when is-prime num
@@ -25,14 +31,75 @@ print-prime num-1, num-2:
 num-1: to-number prompt "What is your 1st number" 
 num-2: to-number prompt "What is your 2nd number"
 
-print-prime num-1, num-2
+print-primes num-1, num-2
 
 
+
+
+
+
+# Unoptimised trial division algorithm
 is-prime number:
-    # code
+    when number !> 1
+        exit wrong
+    
+    loop 2_<number with i
+        when (remainder number, i) = 0
+            exit wrong
+    
+    exit right
 
-is-prime (
-    when defined: number
+
+
+prime-checker:
+    # The value of input element is a string
+    number: ""
+    result: ""
+    
+    check:
+        try
+            result = "|number| is |when !is-prime to-number number: "not "|a prime number"
+        fix
+            # In case user passed an empty string or illegal characters as `number`
+            result = "Please enter a valid positive integer"
+    
+    exit <
+        element
+            heading
+                heading-type: 2
+                text-content: "Prime Number Checker"
+            
+            input
+                input-type: "natural-number"
+                input-placeholder: "Enter a number"
+                input-value::number
+            
+            button
+                event-click: {check}
+                text-content: "Check"
+            
+            element 
+                text-content::result
+    >
+
+
+origin
+    meta-title: "Prime Number Checker"
+    text-font: "Arial, sans-serif"
+    box-colour: "#f4f4f4"
+    box-inner-x: 15
+    
+    prime-checker center
+
+
+
+
+
+
+
+
+
+
 
 
 

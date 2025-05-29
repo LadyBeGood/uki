@@ -10,7 +10,7 @@
     ```
 2. Compile the compiler
     ```sh
-    nim c --d:release --opt:speed --passC:-flto --out:uki --verbosity:0 ./utkrisht/compiler/compiler.nim
+    nim c --d:release --opt:speed --passC:-flto --out:uki --verbosity:0 ./utkrisht/compiler.nim
     ```
 3. (Optional) Clean up the repository after successful compilation:
     ```sh

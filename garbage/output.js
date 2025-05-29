@@ -1,1 +1,0 @@
-let name = (2.0 + (((() => {if (condition1) return 4.0;else if (condition2) return 8.0;else return 10.0;})()) * 6.0));
