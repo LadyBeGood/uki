@@ -6,7 +6,7 @@
 ### Steps
 1. Clone this repository
     ```sh
-    git clone https://github.com/LadyBeGood/utkrisht.git
+    git clone --depth 1 https://github.com/LadyBeGood/utkrisht.git
     ```
 2. Compile the compiler
     ```sh

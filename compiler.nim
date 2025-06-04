@@ -1,14 +1,13 @@
-import tables, strutils, terminal, sets
+## Utkrisht - the Utkrisht programming language
+## Copyright (C) 2025 LadyBeGood
+##
+## This file is part of Utkrisht and is licensed under the AGPL-3.0-or-later.
+## See the license.txt file in the root of this repository.
 
-
-##############################
-# TYPES
-##############################
-
+import tables, strutils, terminal, sets, sequtils
 
 type
     TokenKind* {.pure.} = enum
-        Illegal
         EndOfFile
     
         # Literals  
@@ -22,7 +21,7 @@ type
         LeftRoundBracket   
         RightRoundBracket   
         LeftCurlyBracket   
-        RightCurlyBracket  
+        RightCurlyBracket 
         LeftSquareBracket   
         RightSquareBracket 
         Dot  
@@ -48,19 +47,21 @@ type
         UnderscoreLessThan  
         NewLine  
         Dollar  
-          
       
         # Reserved words  
-        WhenKeyword  
-        ThenKeyword  
-        TryKeyword  
-        FixKeyword  
-        LoopKeyword  
-        WithKeyword  
-        ImportKeyword  
-        ExportKeyword  
-        RightKeyword  
-        WrongKeyword  
+        When  
+        Else  
+        Try  
+        Fix  
+        Loop  
+        With  
+        Import  
+        Export  
+        Right  
+        Wrong
+        Exit
+        Stop
+        Next
       
         # Spacing  
         Indent  
@@ -72,15 +73,32 @@ type
         lexeme*: string  
         line*: int 
     
-    Tokens* = seq[Token]
     
+    # For type checking at analyser phase 
+    # And determining the proper `loop statement`, `loop expression`, `when statement` and `when expression` construct at transformer phase
+    DataType* {.pure.} = enum
+        String 
+        Boolean 
+        Number
+        Procedure
+        Structure
 
-
-
+    
+    
     # Expressions
     Expression* = ref object of RootObj
-    Expressions* = seq[Expression]
 
+    ContainerExpression* = ref object of Expression
+        identifier*: Token
+        arguments*: seq[Expression]
+
+    LiteralExpression* = ref object of Expression
+        value*: Literal
+
+    UnaryExpression* = ref object of Expression
+        operator*: Token
+        right*: Expression
+    
     BinaryExpression* = ref object of Expression
         left*: Expression
         operator*: Token
@@ -88,47 +106,45 @@ type
 
     RangeExpression* = ref object of Expression
         start*: Expression
+        firstOperator*: Token
         stop*: Expression
+        secondOperator*: Token
         step*: Expression
-        operator*: Token
-    
-    UnaryExpression* = ref object of Expression
-        operator*: Token
-        right*: Expression
     
     GroupingExpression* = ref object of Expression
         expression*: Expression
 
-    LiteralExpression* = ref object of Expression
-        value*: Literal
-    
     BlockExpression* = ref object of Expression
-        statements*: Statements
-        
-    ContainerExpression* = ref object of Expression
-        identifier*: Token
-        arguments*: seq[Expression]
+        statements*: seq[Statement]
 
-    WhenThenExpression* = ref object of Expression
-        whenThenSubExpressions*: seq[WhenThenSubExpression]
-    
-    WhenThenSubExpression* = ref object
+    WhenExpression* = ref object of Expression
+        dataTypes*: HashSet[DataType]
+        whenSubExpressions*: seq[WhenSubExpression]
+        
+    WhenSubExpression* = ref object
+        keyword*: Token
         condition*: Expression
         expression*: Expression
-    
-    LoopWithExpression* = ref object of Expression
-        loopWithSubExpressions*: seq[LoopWithSubExpression]
+
+    LoopExpression* = ref object of Expression
+        loopKeyword*: Token
+        withExpressions*: seq[WithExpression]
         expression*: Expression
     
-    LoopWithSubExpression* = ref object
+    WithExpression* = ref object
+        withKeyword*: Token
         iterable*: Expression
-        counters*: seq[string]
+        iterableDataType*: HashSet[DataType]
+        counters*: seq[Token]
     
-    TryFixExpression* = ref object of Expression
+    TryExpression* = ref object of Expression
+        dataTypes*: HashSet[DataType]
+        tryKeyword*: Token
         tryExpression*: Expression
-        tryFixSubExpressions*: seq[TryFixSubExpression]
+        fixExpressions*: seq[FixExpression]
     
-    TryFixSubExpression* = ref object
+    FixExpression* = ref object
+        fixKeyword*: Token
         identifier*: Token
         fixExpression*: Expression
 
@@ -146,45 +162,64 @@ type
         value*: bool
     
 
-    # Statements, TODO
+    # Statements
     Statement* = ref object of RootObj
-    Statements* = seq[Statement]
     
     ExpressionStatement* = ref object of Statement
         expression*: Expression
 
     ContainerStatement* = ref object of Statement
         identifier*: Token
-        parameters*: seq[string]
+        parameters*: seq[Token]
         expression*: Expression
 
-    WhenThenStatement* = ref object of Statement
-        whenThenSubStatements*: seq[WhenThenSubStatement]
-    
-    WhenThenSubStatement* = ref object
+    WhenStatement* = ref object of Statement
+        whenSubStatements*: seq[WhenSubStatement]
+        
+    WhenSubStatement* = ref object
+        keyword*: Token
         condition*: Expression
         `block`*: BlockExpression
 
-    LoopWithStatement* = ref object of Statement
-        loopWithSubStatements*: seq[LoopWithSubStatement]
+    LoopStatement* = ref object of Statement
+        loopKeyword*: Token
+        withStatements*: seq[WithStatement]
         `block`*: BlockExpression
 
-    LoopWithSubStatement* = ref object 
+    WithStatement* = ref object 
+        withKeyword*: Token
         iterable*: Expression
-        counters*: seq[string]
+        iterableDataType*: HashSet[DataType]
+        counters*: seq[Token]
 
-    TryFixStatement* = ref object of Statement
+    TryStatement* = ref object of Statement
+        tryKeyword*: Token
         tryBlock*: BlockExpression
-        tryFixSubStatements*: seq[TryFixSubStatement]
+        fixStatements*: seq[FixStatement]
     
-    TryFixSubStatement* = ref object
+    FixStatement* = ref object
+        fixKeyword*: Token
         identifier*: Token
         fixBlock*: BlockExpression
+    
+    ExitStatement* = ref object of Statement
+        keyword*: Token
+        expression*: Expression
+    
+    NextStatement* = ref object of Statement
+        keyword*: Token
+        counter*: Token
+    
+    StopStatement* = ref object of Statement
+        keyword*: Token
+        counter*: Token
+
+    Context* {.pure.} = enum
+        Function
+        Loop
+        Try
 
 
-##############################
-# ERROR
-##############################
 
 proc error*(line: int, message: string) =
     styledEcho fgRed, "Error", resetStyle, " [Line " & $line & "]: " & message
@@ -195,11 +230,15 @@ proc error*(line: int, message: string) =
 # LEXER
 ##############################
 
-proc lexer*(input: string): Tokens =
+
+
+    
+
+proc lexer*(input: string): seq[Token] =
     # Index of current character
     var index: int
     
-    var tokens: Tokens
+    var tokens: seq[Token]
 
     # Line number 
     var line: int = 1
@@ -209,16 +248,19 @@ proc lexer*(input: string): Tokens =
     
     # For checking if an identifier is a keyword inside `identifier` proc
     const keywords = {
-        "try": TokenKind.TryKeyword,
-        "fix": TokenKind.FixKeyword,
-        "when": TokenKind.WhenKeyword,
-        "then": TokenKind.ThenKeyword,
-        "loop": TokenKind.LoopKeyword,
-        "with": TokenKind.WithKeyword,
-        "right": TokenKind.RightKeyword,
-        "wrong": TokenKind.WrongKeyword,
-        "import": TokenKind.ImportKeyword,
-        "export": TokenKind.ExportKeyword
+        "try": TokenKind.Try,
+        "fix": TokenKind.Fix,
+        "when": TokenKind.When,
+        "else": TokenKind.Else,
+        "loop": TokenKind.Loop,
+        "with": TokenKind.With,
+        "right": TokenKind.Right,
+        "wrong": TokenKind.Wrong,
+        "import": TokenKind.Import,
+        "export": TokenKind.Export,
+        "exit": TokenKind.Exit,
+        "stop": TokenKind.Stop,
+        "next": TokenKind.Next,
     }.toTable
     
     # Make sure no newlines or indentation tokens are emitted inside expression
@@ -462,7 +504,7 @@ when defined lexer:
     import json
     
     let input: string = readFile("./garbage/input.uki")
-    let output: Tokens = lexer(input)
+    let output: seq[Token] = lexer(input)
     writeFile("./garbage/output.js", pretty(%output, indent = 4))
     
 
@@ -471,11 +513,12 @@ when defined lexer:
 # PARSER
 ##############################
 
-proc parser*(tokens: Tokens): Statements =
+proc parser*(tokens: seq[Token]): seq[Statement] =
     var index = 0
-    var tokens: Tokens = tokens
-    var abstractSyntaxTree: Statements
+    var tokens: seq[Token] = tokens
+    var abstractSyntaxTree: seq[Statement]
 
+    
     proc isAtEnd(): bool =
         return tokens[index].tokenKind == EndOfFile
 
@@ -491,8 +534,8 @@ proc parser*(tokens: Tokens): Statements =
         return isCurrentTokenKind(
             TokenKind.NumericLiteral,
             TokenKind.StringLiteral,
-            TokenKind.RightKeyword,
-            TokenKind.WrongKeyword,
+            TokenKind.Right,
+            TokenKind.Wrong,
             TokenKind.Identifier,
             TokenKind.LeftRoundBracket
         )
@@ -500,7 +543,20 @@ proc parser*(tokens: Tokens): Statements =
     proc expect(tokenKinds: varargs[TokenKind]) =
         if isCurrentTokenKind(tokenKinds):
             return
-        error(tokens[index].line, "Expected " & (if tokenKinds.len() == 1: $tokenKinds[0] else: "one of " & $tokenKinds) & " but got " & $tokens[index].tokenKind)
+    
+        let expected = 
+            if tokenKinds.len == 1:
+                $tokenKinds[0]
+            else:
+                "one of " & $tokenKinds
+    
+        let found = 
+            if isCurrentTokenKind(TokenKind.EndOfFile):
+                "reached end of code"
+            else:
+                "got " & $tokens[index].tokenKind
+    
+        error(tokens[index].line, "Expected " & expected & ", but " & found)
 
     proc ignore(tokenKinds: varargs[TokenKind]) =
         if isCurrentTokenKind(tokenKinds):
@@ -533,6 +589,10 @@ proc parser*(tokens: Tokens): Statements =
     
     
     proc containerExpression(): Expression =
+        # ContainerExpression* = ref object of Expression
+        #     identifier*: Token
+        #     arguments*: seq[Expression]
+        
         let identifier: Token = tokens[index]
         index.inc()
         
@@ -547,47 +607,92 @@ proc parser*(tokens: Tokens): Statements =
         return ContainerExpression(identifier: identifier, arguments: arguments)
         
     
-    proc whenThenExpression(): Expression =
+    proc whenExpression(): Expression =
+        # WhenExpression* = ref object of Expression
+        #     dataTypes*: seq[DataType]
+        #     whenSubExpressions*: seq[WhenSubExpression]
+        #   
+        # WhenSubExpression* = ref object
+        #     keyword*: Token
+        #     condition*: Expression
+        #     expression*: expression
+        
+        var whenSubExpressions: seq[WhenSubExpression] = @[]
+        let whenKeyword: Token = tokens[index]
         index.inc()
-        var whenThenSubExpressions: seq[WhenThenSubExpression] = @[]
-        
-        
-        let firstCondition: Expression = expression()
-        
+
+        let whenCondition: Expression = expression()
         expect(TokenKind.Colon)
         index.inc()
         ignore(TokenKind.Indent)
-        
-        let firstExpression: Expression = expression()
-        whenThenSubExpressions.add(WhenThenSubExpression(condition: firstCondition, expression: firstExpression))
     
-        while isCurrentTokenKind(TokenKind.ThenKeyword):
+        let whenExpression: Expression = expression()
+        ignore(TokenKind.Dedent)
+        
+        whenSubExpressions.add(WhenSubExpression(
+            keyword: whenKeyword,
+            condition: whenCondition,
+            expression: whenExpression
+        ))
+        
+        while isCurrentTokenKind(TokenKind.Else):
+            let keyword = tokens[index]
             index.inc()
             var condition: Expression = nil
             if not isCurrentTokenKind(TokenKind.Colon):
                 condition = expression()
+            expect(TokenKind.Colon)
             index.inc()
+            ignore(TokenKind.Indent)
             let expression: Expression = expression()
-            whenThenSubExpressions.add(WhenThenSubExpression(condition: condition, expression: expression))
+            ignore(TokenKind.Dedent)
+            whenSubExpressions.add(WhenSubExpression(
+                keyword: keyword, 
+                condition: condition, 
+                expression: expression
+            ))
         
-        ignore(TokenKind.Dedent)
-        return WhenThenExpression(whenThenSubExpressions: whenThenSubExpressions)
+        return WhenExpression(
+            dataTypes: initHashSet[DataType](),
+            whenSubExpressions: whenSubExpressions
+        )
         
-    
-    proc loopWithExpression(): Expression =
+
+    proc loopExpression(): Expression =
+        # LoopExpression* = ref object of Expression
+        #     loopKeyword*: Token
+        #     withExpressions*: seq[WithExpression]
+        #     expression*: Expression
+        #
+        # WithExpression* = ref object
+        #     withKeyword*: Token
+        #     iterable*: Expression
+        #     iterableDataType*: DataType
+        #     counters*: seq[Token]
+        
+        let loopKeyword: Token = tokens[index]
         index.inc()
-        var loopWithSubExpressions: seq[LoopWithSubExpression] = @[]
+        
+        var withExpressions: seq[WithExpression] = @[]
         while isCurrentTokenExpressionStart():
             let iterable: Expression = expression()
-            var counters: seq[string] = @[]
-            if isCurrentTokenKind(TokenKind.WithKeyword):
+            var counters: seq[Token] = @[]
+            var withKeyword: Token = nil
+            
+            if isCurrentTokenKind(TokenKind.With):
+                withKeyword = tokens[index]
                 index.inc()
                 expect(TokenKind.Identifier)
                 while isCurrentTokenKind(TokenKind.Identifier):
-                    counters.add(tokens[index].lexeme)
+                    counters.add(tokens[index])
                     index.inc()
                     
-            loopWithSubExpressions.add(LoopWithSubExpression(iterable: iterable, counters: counters))
+            withExpressions.add(WithExpression(
+                withKeyword: withKeyword, 
+                iterable: iterable, 
+                iterableDataType: initHashSet[DataType](),
+                counters: counters,
+            ))
             if isCurrentTokenKind(TokenKind.Comma):
                 index.inc()
             else:
@@ -595,38 +700,74 @@ proc parser*(tokens: Tokens): Statements =
         
         expect(TokenKind.Colon)
         index.inc()
-        ignore(TokenKind.Indent)
         
+        ignore(TokenKind.Indent)
         let expression: Expression = expression()
         ignore(TokenKind.Dedent)
-        return LoopWithExpression(loopWithSubExpressions: loopWithSubExpressions, expression: expression)
+        
+        return LoopExpression(
+            loopKeyword: loopKeyword,
+            withExpressions: withExpressions, 
+            expression: expression
+        )
 
 
-    proc tryFixExpression(): Expression =
+    proc tryExpression(): Expression =
+        # TryExpression* = ref object of Expression
+        #     dataTypes*: HashSet[DataType]
+        #     tryKeyword*: Token
+        #     tryExpression*: Expression
+        #     fixExpressions*: seq[FixExpression]
+        #
+        # FixExpression* = ref object
+        #     fixKeyword*: Token
+        #     identifier*: Token
+        #     fixExpression*: Expression
+
+        let tryKeyword: Token = tokens[index]
         index.inc()
         expect(TokenKind.Colon)
+        index.inc()
+        
         ignore(TokenKind.Indent)
-        
         let tryExpression: Expression = expression()
+        ignore(TokenKind.Dedent)
         
-        var tryFixSubExpressions: seq[TryFixSubExpression] = @[]
+        var fixExpressions: seq[FixExpression] = @[]
         
-        while isCurrentTokenKind(TokenKind.FixKeyword):
+        while isCurrentTokenKind(TokenKind.Fix):
+            let fixKeyword: Token = tokens[index]
             index.inc()
             var identifier: Token = nil
-            if not isCurrentTokenKind(TokenKind.Colon):
-                expect(TokenKind.Identifier)
+            if isCurrentTokenKind(TokenKind.Identifier):
                 identifier = tokens[index]
+                index.inc()
+            expect(TokenKind.Colon)
+            index.inc()
             ignore(TokenKind.Indent)
             let fixExpression: Expression = expression()
-            tryFixSubExpressions.add(TryFixSubExpression(identifier: identifier, fixExpression: fixExpression))
+            ignore(TokenKind.Dedent)
+            fixExpressions.add(FixExpression(
+                fixKeyword: fixKeyword,
+                identifier: identifier, 
+                fixExpression: fixExpression
+            ))
 
-        return TryFixExpression(tryExpression: tryExpression, tryFixSubExpressions: tryFixSubExpressions)
+        return TryExpression(
+            dataTypes: initHashSet[DataType](),
+            tryKeyword: tryKeyword,
+            tryExpression: tryExpression, 
+            fixExpressions: fixExpressions
+        )
 
     
     proc blockExpression(): BlockExpression =
+        # BlockExpression* = ref object of Expression
+        #     statements*: seq[Statement]
+
+        expect(TokenKind.Indent)
         index.inc()            
-        var statements: Statements = @[]
+        var statements: seq[Statement] = @[]
         
         while not isAtEnd() and not isCurrentTokenKind(TokenKind.Dedent):
             statements.add(statement())
@@ -639,37 +780,79 @@ proc parser*(tokens: Tokens): Statements =
     
     
     proc primaryExpression(): Expression =
-        if isCurrentTokenKind(TokenKind.RightKeyword):
+        if isCurrentTokenKind(TokenKind.Right):
+            # LiteralExpression* = ref object of Expression
+            #     value*: Literal
+            #
+            # BooleanLiteral* = ref object of Literal
+            #     value*: bool
+            
             result = LiteralExpression(value: BooleanLiteral(value: true))
             index.inc()            
-        elif isCurrentTokenKind(TokenKind.WrongKeyword):
+        elif isCurrentTokenKind(TokenKind.Wrong):
+            # LiteralExpression* = ref object of Expression
+            #     value*: Literal
+            #
+            # BooleanLiteral* = ref object of Literal
+            #     value*: bool
+            
             result = LiteralExpression(value: BooleanLiteral(value: false))
             index.inc()            
         elif isCurrentTokenKind(TokenKind.StringLiteral):
+            # LiteralExpression* = ref object of Expression
+            #     value*: Literal
+            #
+            # StringLiteral* = ref object of Literal
+            #     value*: string
+            
             result = LiteralExpression(value: StringLiteral(value: tokens[index].lexeme))
             index.inc()            
         elif isCurrentTokenKind(TokenKind.NumericLiteral):
+            # LiteralExpression* = ref object of Expression
+            #     value*: Literal
+            #
+            # NumericLiteral* = ref object of Literal
+            #     value*: float
+        
             result = LiteralExpression(value: NumericLiteral(value: parseFloat(tokens[index].lexeme)))
             index.inc()
         elif isCurrentTokenKind(TokenKind.LeftRoundBracket):
+            # GroupingExpression* = ref object of Expression
+            #     expression*: Expression
             index.inc()            
             result = GroupingExpression(expression: expression())
             expect(TokenKind.RightRoundBracket)
             index.inc()
         elif isCurrentTokenKind(TokenKind.Identifier):
             return containerExpression()
-        elif isCurrentTokenKind(TokenKind.WhenKeyword):
-            return whenThenExpression()
-        elif isCurrentTokenKind(TokenKind.LoopKeyword):
-            return loopWithExpression()
-        elif isCurrentTokenKind(TokenKind.TryKeyword):
-            return tryFixExpression()
+        elif isCurrentTokenKind(TokenKind.When):
+            return whenExpression()
+        elif isCurrentTokenKind(TokenKind.Loop):
+            return loopExpression()
+        elif isCurrentTokenKind(TokenKind.Try):
+            return tryExpression()
         elif isCurrentTokenKind(TokenKind.Indent):
             return blockExpression()
         else:
-            error(tokens[index].line, "Expected expression but got " & $tokens[index].tokenKind)
+            if isCurrentTokenKind(TokenKind.With):
+                error(tokens[index].line, "Can not use with expression without loop expression")
+            elif isCurrentTokenKind(TokenKind.Else):
+                error(tokens[index].line, "Can not use else expression without when expression")
+            elif isCurrentTokenKind(TokenKind.Fix):
+                error(tokens[index].line, "Can not use fix expression without try expression")
+            
+            error(tokens[index].line, "Expected an expression but " & (
+                if isCurrentTokenKind(TokenKind.EndOfFile):
+                    "reached end of code"
+                else:
+                    "got " & $tokens[index].tokenKind
+            ))
     
     proc unaryExpression(): Expression =
+        # UnaryExpression* = ref object of Expression
+        #     operator*: Token
+        #     right*: Expression
+        
         if isCurrentTokenKind(TokenKind.Exclamation, TokenKind.Minus):
             let operator: Token = tokens[index]
             index.inc()
@@ -679,23 +862,43 @@ proc parser*(tokens: Tokens): Statements =
         return primaryExpression()
     
     proc rangeExpression(): Expression =
+        # RangeExpression* = ref object of Expression
+        #     start*: Expression
+        #     firstOperator*: Token
+        #     stop*: Expression
+        #     secondOperator*: Token
+        #     step*: Expression
+        
         var startExpression = unaryExpression()
         if not isCurrentTokenKind(TokenKind.Underscore, TokenKind.UnderscoreLessThan):
             return startExpression
         
-        let operator: Token = tokens[index]
+        let firstOperator: Token = tokens[index]
         index.inc()
         let stopExpression = unaryExpression()
+        var secondOperator: Token = nil
         var stepExpression: Expression = LiteralExpression(value: NumericLiteral(value: 1.0))
         
         if isCurrentTokenKind(TokenKind.Underscore):
+            secondOperator = tokens[index]
             index.inc()
             stepExpression = unaryExpression()
         
-        return RangeExpression(start: startExpression, stop: stopExpression, step: stepExpression, operator: operator)
+        return RangeExpression(
+            start: startExpression, 
+            firstOperator: firstOperator,
+            stop: stopExpression, 
+            secondOperator: secondOperator,
+            step: stepExpression, 
+        )
 
     
     proc multiplicationAndDivisionExpression(): Expression =
+        # BinaryExpression* = ref object of Expression
+        #     left*: Expression
+        #     operator*: Token
+        #     right*: Expression
+        
         var expression: Expression = rangeExpression()
         
         while isCurrentTokenKind(TokenKind.Asterisk, TokenKind.Slash):  
@@ -708,6 +911,11 @@ proc parser*(tokens: Tokens): Statements =
     
     
     proc additionAndSubstractionExpression(): Expression =
+        # BinaryExpression* = ref object of Expression
+        #     left*: Expression
+        #     operator*: Token
+        #     right*: Expression
+        
         var expression: Expression = multiplicationAndDivisionExpression()
 
         while isCurrentTokenKind(TokenKind.Plus, TokenKind.Minus):
@@ -720,6 +928,11 @@ proc parser*(tokens: Tokens): Statements =
     
     
     proc comparisonExpression(): Expression =
+        # BinaryExpression* = ref object of Expression
+        #     left*: Expression
+        #     operator*: Token
+        #     right*: Expression
+
         var expression: Expression = additionAndSubstractionExpression()
         
         while isCurrentTokenKind(TokenKind.MoreThan, TokenKind.LessThan, TokenKind.ExclamationMoreThan, TokenKind.ExclamationLessThan):
@@ -732,6 +945,11 @@ proc parser*(tokens: Tokens): Statements =
     
     
     proc equalityAndInequalityExpression(): Expression =
+        # BinaryExpression* = ref object of Expression
+        #     left*: Expression
+        #     operator*: Token
+        #     right*: Expression
+
         var expression: Expression = comparisonExpression()
         
         while isCurrentTokenKind(TokenKind.Equal, TokenKind.ExclamationEqual):
@@ -744,23 +962,31 @@ proc parser*(tokens: Tokens): Statements =
 
     
     proc expression(): Expression =
+        # Expression* = ref object of RootObj
         return equalityAndInequalityExpression()
 
 
     proc expressionStatement(): Statement =
+        # ExpressionStatement* = ref object of Statement
+        #     expression*: expression
         result = ExpressionStatement(expression: expression())
         expect(TokenKind.Newline, TokenKind.Dedent, TokenKind.EndOfFile)
         ignore(TokenKind.Newline)
     
+    
     proc containerStatement(): Statement =
+        # ContainerStatement* = ref object of Statement
+        #     identifier*: Token
+        #     parameters*: seq[Token]
+        #     expression*: Expression
+        
         if isThisExpressionStatement2(): return expressionStatement()
-        echo 56
         let identifier: Token = tokens[index]
         index.inc()
         
-        var parameters: seq[string]
+        var parameters: seq[Token]
         while isCurrentTokenKind(TokenKind.Identifier):
-            parameters.add(tokens[index].lexeme)
+            parameters.add(tokens[index])
             index.inc()
         
             if isCurrentTokenKind(TokenKind.Comma):
@@ -778,90 +1004,216 @@ proc parser*(tokens: Tokens): Statements =
         return ContainerStatement(identifier: identifier, parameters: parameters, expression: expression)
 
     
-    proc whenThenStatement(): Statement =
+    proc whenStatement(): Statement =
+        # WhenStatement* = ref object of Statement
+        #     whenSubStatements*: seq[WhenSubStatement]
+        #   
+        # WhenSubStatement* = ref object
+        #     keyword*: Token
+        #     condition*: Expression
+        #     `block`*: blockExpression
+        
         if isThisExpressionStatement(): return expressionStatement()
         
+        var whenSubStatements: seq[WhenSubStatement] = @[]
+        let whenKeyword: Token = tokens[index]
         index.inc()
-        var whenThenSubStatements: seq[WhenThenSubStatement] = @[]
         
-        let firstCondition: Expression = expression()
+        let whenCondition: Expression = expression()
+        let whenBlock: BlockExpression = blockExpression()
+
+        whenSubStatements.add(WhenSubStatement(
+            keyword: whenKeyword,
+            condition: whenCondition,
+            `block`: whenBlock
+        ))
         
-        expect(TokenKind.Indent)
-        let firstBlock: BlockExpression = blockExpression()
-        whenThenSubStatements.add(WhenThenSubStatement(condition: firstCondition, `block`: firstBlock))
-    
-        while isCurrentTokenKind(TokenKind.ThenKeyword):
+        while isCurrentTokenKind(TokenKind.Else):
+            let keyword = tokens[index]
             index.inc()
             var condition: Expression = nil
             if not isCurrentTokenKind(TokenKind.Indent):
                 condition = expression()
-            let `block`: BlockExpression = blockExpression()
-            whenThenSubStatements.add(WhenThenSubStatement(condition: condition, `block`: `block`))
 
-        return WhenThenStatement(whenThenSubStatements: whenThenSubStatements)
+            let `block`: BlockExpression = blockExpression()
+
+            whenSubStatements.add(WhenSubStatement(keyword: keyword, condition: condition, `block`: `block`))
         
+
+            
+        return WhenStatement(
+            whenSubStatements: whenSubStatements
+        )
     
-    proc loopWithStatement(): Statement =
+    proc loopStatement(): Statement =
+        # LoopStatement* = ref object of Statement
+        #     loopKeyword*: Token
+        #     withStatements*: seq[WithStatement]
+        #     `block`*: BlockExpression
+        #
+        # WithStatement* = ref object 
+        #     withKeyword*: Token
+        #     iterable*: Expression
+        #     iterableDataType*: DataType
+        #     counters*: seq[Token]
+        
         if isThisExpressionStatement(): return expressionStatement()
         
+        let loopKeyword: Token = tokens[index]
         index.inc()
-        var loopWithSubStatements: seq[LoopWithSubStatement] = @[]
+        
+        var withStatements: seq[WithStatement] = @[]
         while isCurrentTokenExpressionStart():
+            var withKeyword: Token
             let iterable: Expression = expression()
-            var counters: seq[string] = @[]
-            if isCurrentTokenKind(TokenKind.WithKeyword):
+            var counters: seq[Token] = @[]
+            
+            if isCurrentTokenKind(TokenKind.With):
+                withKeyword = tokens[index]
                 index.inc()
                 expect(TokenKind.Identifier)
                 while isCurrentTokenKind(TokenKind.Identifier):
-                    counters.add(tokens[index].lexeme)
+                    counters.add(tokens[index])
                     index.inc()
                     
-            loopWithSubStatements.add(LoopWithSubStatement(iterable: iterable, counters: counters))
+            withStatements.add(WithStatement(
+                withKeyword: withKeyword, 
+                iterable: iterable, 
+                iterableDataType: initHashSet[DataType](),
+                counters: counters
+            ))
             if isCurrentTokenKind(TokenKind.Comma):
                 index.inc()
             else:
                 break
         
-        expect(TokenKind.Indent)
+
         let `block` = blockExpression()
-        return LoopWithStatement(loopWithSubStatements: loopWithSubStatements, `block`: `block`)
+
+        return LoopStatement(
+            loopKeyword: loopKeyword,
+            withStatements: withStatements, 
+            `block`: `block`
+        )
 
 
-    proc tryFixStatement(): Statement =
+    proc tryStatement(): Statement =
+        # TryStatement* = ref object of Statement
+        #     tryKeyword*: Token
+        #     tryBlock*: BlockExpression
+        #     fixStatements*: seq[FixStatement]
+        #
+        # FixStatement* = ref object
+        #     fixKeyword*: Token
+        #     identifier*: Token
+        #     fixBlock*: BlockExpression
+    
         if isThisExpressionStatement(): return expressionStatement()
         
+        let tryKeyword: Token = tokens[index]
         index.inc()
-        expect(TokenKind.Indent)
+
+        
         let tryBlock: BlockExpression = blockExpression()
+
         
-        var tryFixSubStatements: seq[TryFixSubStatement] = @[]
+        var fixStatements: seq[FixStatement] = @[]
         
-        while isCurrentTokenKind(TokenKind.FixKeyword):
+        while isCurrentTokenKind(TokenKind.Fix):
+            let fixKeyword: Token = tokens[index]
             index.inc()
             var identifier: Token = nil
-            if not isCurrentTokenKind(TokenKind.Indent):
-                expect(TokenKind.Identifier)
+            if isCurrentTokenKind(TokenKind.Identifier):
                 identifier = tokens[index]
+                index.inc()
+            
+
             let fixBlock: BlockExpression = blockExpression()
-            tryFixSubStatements.add(TryFixSubStatement(identifier: identifier, fixBlock: fixBlock))
+            
+            fixStatements.add(FixStatement(
+                fixKeyword: fixKeyword,
+                identifier: identifier, 
+                fixBlock: fixBlock
+            ))
 
-        return TryFixStatement(tryBlock: tryBlock, tryFixSubStatements: tryFixSubStatements)
+        return TryStatement(
+            tryKeyword: tryKeyword,
+            tryBlock: tryBlock, 
+            fixStatements: fixStatements
+        )
 
-    
+
+    proc exitStatement(): Statement =
+        # ExitStatement* = ref object of Statement
+        #     keyword*: Token
+        #     expression*: Expression
+        
+        let keyword: Token = tokens[index]
+        index.inc()
+        var expression: Expression = nil
+        if isCurrentTokenExpressionStart():
+            expression = expression()
+        
+        # EndOfFile should not be expected here but it helps 
+        # in skipping this error message and giving a more suitable
+        # error message at analysis phase
+        expect(TokenKind.Dedent, TokenKind.Newline, TokenKind.EndOfFile)
+        
+        ignore(TokenKind.Newline)
+        return ExitStatement(keyword: keyword, expression: expression)
+
+    proc stopOrNextStatement(): Statement =
+        # NextStatement* = ref object of Statement
+        #     keyword*: Token
+        #     counter*: Token
+        #
+        # StopStatement* = ref object of Statement
+        #     keyword*: Token
+        #     counter*: tokens
+        
+        let keyword: Token = tokens[index]
+        index.inc()
+        var counter: Token = nil
+        if isCurrentTokenKind(TokenKind.Identifier):
+            counter = tokens[index]
+        
+        
+        # EndOfFile should not be expected here but it helps 
+        # in skipping this parser error message and giving a more suitable
+        # error message at analysis phase
+        expect(TokenKind.Dedent, TokenKind.Newline, TokenKind.EndOfFile)
+        
+        ignore(TokenKind.Newline)
+        if keyword.tokenKind == TokenKind.Stop: 
+            return StopStatement(keyword: keyword, counter: counter)
+        else:
+            return NextStatement(keyword: keyword, counter: counter)
+            
     
     proc statement(): Statement =
+        # Statement* = ref object of RootObj
+        
         if isCurrentTokenKind(TokenKind.Identifier):
             return containerStatement()
-        elif isCurrentTokenKind(TokenKind.WhenKeyword):
-            return whenThenStatement()
-        elif isCurrentTokenKind(TokenKind.LoopKeyword):
-            return loopWithStatement()
-        elif isCurrentTokenKind(TokenKind.TryKeyword):
-            return tryFixStatement()
+        elif isCurrentTokenKind(TokenKind.When):
+            return whenStatement()
+        elif isCurrentTokenKind(TokenKind.Loop):
+            return loopStatement()
+        elif isCurrentTokenKind(TokenKind.Try):
+            return tryStatement()
+        elif isCurrentTokenKind(TokenKind.Exit):
+            return exitStatement()
+        elif isCurrentTokenKind(TokenKind.Stop, TokenKind.Next):
+            return stopOrNextStatement()
         else:
-            return expressionStatement()
-
-
+            if isCurrentTokenKind(TokenKind.Else):
+                error(tokens[index].line, "Can not use `else` statement without `when` statement")
+            elif isCurrentTokenKind(TokenKind.Fix):
+                error(tokens[index].line, "Can not use `fix` statement without `try` statement")
+            elif isCurrentTokenKind(TokenKind.With):
+                error(tokens[index].line, "Can not use `with` statement without `loop` statement")
+            else: 
+                return expressionStatement()
 
     while not isAtEnd():
         abstractSyntaxTree.add(statement())
@@ -878,60 +1230,262 @@ proc parser*(tokens: Tokens): Statements =
 ##############################
 
 
-proc analyser*(abstractSyntaxTree: Statements): Statements =
-    var
-        scopes: seq[HashSet[string]] = @[]
-        currentFunction = "none"
-        currentLoop = 0
-        inWhenThen = false
-        inTryFix = false
-        inLoopWith = false
-
-
+proc analyser*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
+    var scopes: seq[TableRef[string, HashSet[DataType]]] = @[]
+    var contexts: seq[Context] = @[]
+    
     proc beginScope() =
-        scopes.add(initHashSet[string]())
+        scopes.add(newTable[string, HashSet[DataType]]())
 
     proc endScope() =
         discard scopes.pop()
 
-    proc define(statement: ContainerStatement) =
-        let name: string = statement.identifier.lexeme
-        let line: int = statement.identifier.line
+    proc addContext(context: Context) =
+        contexts.add(context)
+    
+    proc popContext() =
+        discard contexts.pop()
+    
+    
+    proc insideFunction(): bool =
+        for i in countdown(contexts.high, 0):
+            if contexts[i] == Context.Function:
+                return true
+        return false
+    
+    proc insideLoop(): bool =
+        for i in countdown(contexts.high, 0):
+            case contexts[i]
+            of Context.Loop: return true
+            of Context.Function: break
+            of Context.Try: continue
+        return false
 
-        if scopes.len == 0:
-            return
+    proc defineContainer(name: string, line: int, dataTypes: HashSet[DataType]) =
         if name in scopes[^1]:
-            error(line, "Variable '" & name & "' already declared in this scope")
-        incl scopes[^1], name
+            error(line, "Container `" & name & "` already defined in this scope")
+        scopes[^1][name] = dataTypes
 
-    proc analyseLocal(expression: ContainerExpression) =
-        let name: string = expression.identifier.lexeme
-        let line: int = expression.identifier.line
-
+    proc defineStandardLibrary() =
+        let standardLibraryFunctionNames = [
+            "write",
+            "prompt",
+            "alert",
+            "confirm",
+            
+            "exit",
+            "quit",
+            "skip",
+            
+            "to-number",
+            "to-string",
+            "to-boolean",
+            "to-structure",
+            
+            "is-number",
+            "is-string",
+            "is-boolean",
+            "is-structure",
+            
+            "reverse",
+            "uppercase",
+            "lowercase",
+            "is-prefix",
+            "is-suffix",
+            "repeat",
+            "contains",
+            "strip",
+            
+            "absolute",
+            "remainder",
+            "max",
+            "min",
+            "truncate",
+            "estimate-min",
+            "estimate",
+            "estimate-max",
+            "random",
+            "power",
+            
+            "insert",
+            "remove",
+            
+            "keys",
+            "values"
+        ]
+        for functionName in standardLibraryFunctionNames:
+            defineContainer(functionName, -1, toHashSet([DataType.Procedure]))
+    
+    proc resolveContainer(name: string, line: int): HashSet[DataType] =
         for i in countdown(scopes.high, 0):
             if name in scopes[i]:
-                return
-        error line, "Error: undefined variable '" & name & "'"
+                return scopes[i][name]
+        error(line, "Undefined container `" & name & "`")
 
+    proc analyseExpression(expression: Expression): HashSet[DataType] 
+    proc analyseStatement(statement: Statement)
+    
+    
+    proc expect(expression: Expression, expectedes: varargs[HashSet[DataType]]): HashSet[DataType] =
+        let dataTypes: HashSet[DataType] = analyseExpression(expression)
+        
+        for expected in expectedes:
+            if allIt(dataTypes, it in expected):
+                return dataTypes
+        
+        error(-1, "NOOO")
+        
+    
 
-    proc analyseExpression(expression: Expression) =
-        if expression of ContainerExpression:
-            analyseLocal(ContainerExpression(expression))
-
+    proc analyseExpression(expression: Expression): HashSet[DataType] =
+        if expression of LiteralExpression:
+            let literal = LiteralExpression(expression).value
+            if literal of StringLiteral:
+                return toHashSet([DataType.String])
+            elif literal of NumericLiteral:
+                return toHashSet([DataType.Number])
+            elif literal of BooleanLiteral:
+                return toHashSet([DataType.Boolean])
+        
+        elif expression of ContainerExpression:
+            let expression = ContainerExpression(expression)
+            return resolveContainer(expression.identifier.lexeme, expression.identifier.line)
+        
+        elif expression of UnaryExpression:
+            let expression = UnaryExpression(expression)
+            if (expression.operator.tokenKind == TokenKind.Exclamation):
+                return expect(expression.right, toHashSet([DataType.Boolean]))
+            elif (expression.operator.tokenKind == TokenKind.Minus):
+                return expect(expression.right, toHashSet([DataType.Number]))
+        
+        elif expression of BinaryExpression:
+            let expression = BinaryExpression(expression)
+            
+            if expression.operator.tokenKind == TokenKind.Plus:
+                let leftDataType =  expect(expression.left,  toHashSet([DataType.String]), toHashSet([DataType.Number]))
+                let rightDataType = expect(expression.right, toHashSet([DataType.String]), toHashSet([DataType.Number]))
+                
+                if leftDataType != rightDataType:
+                    error(expression.operator.line, "Expected both to be Numbers or Strings")
+                return leftDataType
+            else:
+                discard expect(expression.left, toHashSet([DataType.Number]))
+                discard expect(expression.right, toHashSet([DataType.Number]))
+                return toHashSet([DataType.Number])
+            
+        elif expression of RangeExpression:
+            let expression = RangeExpression(expression)
+            discard expect(expression.start, toHashSet([DataType.Number]))
+            discard expect(expression.stop,  toHashSet([DataType.Number]))
+            discard expect(expression.step,  toHashSet([DataType.Number]))
+            return toHashSet([DataType.Structure])
+        
+        elif expression of GroupingExpression:
+            let expression = GroupingExpression(expression)
+            return analyseExpression(expression.expression)
+        
+        elif expression of BlockExpression:
+            let expression = BlockExpression(expression)
+            beginScope()
+            for statement in expression.statements:
+                analyseStatement(statement)
+            endScope()
+            return toHashSet([DataType.Procedure])
+        
+        elif expression of WhenExpression:
+            let expression = WhenExpression(expression)
+            for subExpression in expression.whenSubExpressions:
+                discard expect(subExpression.condition, toHashSet([DataType.Boolean]))
+                expression.dataTypes.incl(analyseExpression(subExpression.expression))
+            return expression.dataTypes
+        
+        elif expression of TryExpression:
+            let expression = TryExpression(expression)
+            beginScope()
+            expression.dataTypes.incl(analyseExpression(expression.tryExpression))
+            for subExpression in expression.fixExpressions:
+                expression.dataTypes.incl(analyseExpression(subExpression.fixExpression))
+            endScope()
+            return expression.dataTypes
+        
+        elif expression of LoopExpression:
+            let expression = LoopExpression(expression)
+            beginScope()
+            for subExpression in expression.withExpressions:
+                let iterableDataType = analyseExpression(subExpression.iterable)
+                subExpression.iterableDataType = iterableDataType
+                for counter in subExpression.counters:
+                    defineContainer(counter.lexeme, counter.line, initHashSet[DataType]())
+            let h = analyseExpression(expression.expression)
+            endScope()
+            return h
+        else:
+            error(-1, "Unknown expression (internal error, meant for compiler diagnostics)")
 
     proc analyseStatement(statement: Statement) =
-        if statement of ContainerStatement:
-            define(ContainerStatement(statement))
-        elif statement of ExpressionStatement:
-            analyseExpression(ExpressionStatement(statement).expression)
-        # Add more statement types as needed
+        if statement of ExpressionStatement:
+            let statement =  ExpressionStatement(statement)
+            discard analyseExpression(statement.expression)
+        elif statement of ContainerStatement:
+            let statement = ContainerStatement(statement)
+            defineContainer(statement.identifier.lexeme, statement.identifier.line, analyseExpression(statement.expression))
+            beginScope()
+            addContext(Context.Function)
+            for parameter in statement.parameters:
+                defineContainer(parameter.lexeme, parameter.line, initHashSet[DataType]())
+            popContext()
+            endScope()
+        elif statement of WhenStatement:
+            let statement = WhenStatement(statement)
+            for subStatement in statement.whenSubStatements:
+                discard expect(subStatement.condition, toHashSet([DataType.Boolean]))
+                discard analyseExpression(subStatement.`block`)
+        elif statement of TryStatement:
+            let statement = TryStatement(statement)
+            beginScope()
+            discard analyseExpression(statement.tryBlock)
+            for subStatement in statement.fixStatements:
+                discard analyseExpression(subStatement.fixBlock)
+            endScope()
+        elif statement of LoopStatement:
+            let statement = LoopStatement(statement)
+            beginScope()
+            addContext(Context.Loop)
+            for withStatement in statement.withStatements:
+                withStatement.iterableDataType.incl(analyseExpression(withStatement.iterable))
+                for counter in withStatement.counters:
+                    defineContainer(counter.lexeme, counter.line, initHashSet[DataType]())
+            discard analyseExpression(statement.`block`)
+            popContext()
+            endScope()
+        elif statement of ExitStatement:
+            let statement = ExitStatement(statement)
+            if not insideFunction():
+                error(statement.keyword.line, "Can not exit outside a function")
+        elif statement of StopStatement:
+            let statement = StopStatement(statement)
+            if not insideLoop():
+                error(statement.keyword.line, "Can not stop the iteration outside a loop")
+        elif statement of NextStatement:
+            let statement = NextStatement(statement)
+            if not insideLoop():
+                error(statement.keyword.line, "Can not skip to next iteration outside a loop")
+        else:
+            error(-1, "Unknown statement (internal error, meant for compiler diagnostics)")
 
-
-
+    # Global scope begin
+    beginScope()
+    
+    defineStandardLibrary()
+    
     # Main resolution process
     for statement in abstractSyntaxTree:
         analyseStatement(statement)
+    
+    # Global scope end
+    endScope()
 
+    
     return abstractSyntaxTree
 
 
@@ -940,7 +1494,7 @@ proc analyser*(abstractSyntaxTree: Statements): Statements =
 # TRANSFORMER
 ##############################
 
-proc transformer*(abstractSyntaxTree: Statements): Statements =
+proc transformer*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
     return abstractSyntaxTree
 
 
@@ -950,7 +1504,7 @@ proc transformer*(abstractSyntaxTree: Statements): Statements =
 ##############################
 
 
-proc generator*(abstractSyntaxTree: Statements): string =
+proc generator*(abstractSyntaxTree: seq[Statement]): string =
     return ""
     
     
@@ -967,7 +1521,7 @@ proc compiler*(input: string): string =
 
 
 
-when isMainModule:
+when defined compiler:
     import os
     
     if paramCount() < 1:
@@ -994,13 +1548,11 @@ when isMainModule:
         # Create output directory if it doesn't exist
         createDir(absOutputPath.parentDir)
         writeFile(absOutputPath, output)
-        styledEcho(fgGreen, "Success: ", resetStyle, "Compiled ", fgBlue, absInputPath, 
-                             resetStyle, " to ", fgMagenta, absOutputPath)
     except IOError as e:
         styledEcho(fgRed, "Error: ", resetStyle, e.msg)
         quit(1)
     except:
-        styledEcho(fgRed, "Error: ", resetStyle, "Unexpected error during compilation")
+        styledEcho(fgRed, "Error: ", resetStyle, "This error will never occur")
         quit(1)
 
 

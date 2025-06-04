@@ -83,20 +83,17 @@ prime-checker:
     >
 
 
-origin
-    meta-title: "Prime Number Checker"
-    text-font: "Arial, sans-serif"
-    box-colour: "#f4f4f4"
-    box-inner-x: 15
-    
-    prime-checker center
 
 
-
-
-
-
-
+render <
+    origin
+        meta-title: "Prime Number Checker"
+        text-font: "Arial, sans-serif"
+        box-colour: "#f4f4f4"
+        box-inner-x: 15
+        
+        prime-checker center
+>
 
 
 
