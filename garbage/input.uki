@@ -1,7 +1,1 @@
-
-name: right
-items: 20
-
-when name
-    loop items with item
-        item
+write name
