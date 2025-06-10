@@ -1,0 +1,114 @@
+
+is-prime num:
+    when num !> 1
+        exit wrong
+    else num = 2
+        exit right
+    else (remainder num, 2) = 0
+        exit wrong
+
+    loop 3_(power num, 0.5)_2 with i
+        when (remainder num, i) = 0
+            exit wrong
+
+    exit right
+
+
+print-primes num-1, num-2: 
+    write "Prime numbers from |num-1| to |num-2| are:"
+    
+    loop num-1_num-2 with num
+        when is-prime num
+            write num
+
+
+num-1: to-number prompt "What is your 1st number" 
+num-2: to-number prompt "What is your 2nd number"
+
+print-primes num-1, num-2
+
+
+
+
+
+
+# Unoptimised trial division algorithm
+is-prime number:
+    when number !> 1
+        exit wrong
+    
+    loop 2_<number with i
+        when (remainder number, i) = 0
+            exit wrong
+    
+    exit right
+
+
+
+prime-checker:
+    # The value of input element is a string
+    number: ""
+    result: ""
+
+    check:
+        try
+            result = "|number| is |when !is-prime to-number number: "not "|a prime number"
+        fix
+            # In case user passed an empty string or illegal characters as `number`
+            result = "Please enter a valid positive integer"
+    
+    exit % element
+        heading
+            heading-type: 2
+            text-content: "Prime Number Checker"
+        
+        input
+            input-type: "natural-number"
+            input-placeholder: "Enter a number"
+            input-value::number
+        
+        button
+            event-click: {check}
+            text-content: "Check"
+        
+        element
+            text-content::result
+
+
+
+
+render % origin 
+    meta-title: "Prime Number Checker"
+    text-font: "Arial, sans-serif"
+    box-colour: "#f4f4f4"
+    box-inner-x: 15
+    custom-script: "<script src=\"https://kit.fontawesome.com/24c3243e9d.js\" crossorigin=\"anonymous\"></script>"
+
+    prime-checker centre
+
+
+
+
+
+number?: es.parse-int "23"
+
+show message? ~ 10:
+    when message = none
+        error "This is not a number"
+    write message
+    
+    exit % element centre
+        text-content: message
+        box-border: ["2px", "solid", colours.green]
+        
+
+
+show number
+
+
+
+
+
+
+
+
