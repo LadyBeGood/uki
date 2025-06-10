@@ -85,7 +85,11 @@ type
     ContainerExpression* = ref object of Expression
         identifier*: Token
         arguments*: seq[Expression]
-
+    
+    Argument* = ref object
+        identifier*: Token
+        value*: Expression
+    
     LiteralExpression* = ref object of Expression
         value*: Literal
 
@@ -162,9 +166,17 @@ type
     ExpressionStatement* = ref object of Statement
         expression*: Expression
 
-    ContainerStatement* = ref object of Statement
+    ContainerAssignmentStatement* = ref object of Statement
         identifier*: Token
-        parameters*: seq[Token]
+        parameters*: seq[Parameter]
+        expression*: Expression
+    
+    Parameter* = ref object
+        identifier*: Token
+        defaultValue*: Expression
+    
+    ContainerReassignmentStatement* = ref object of Statement
+        identifier*: Token
         expression*: Expression
 
     WhenStatement* = ref object of Statement
@@ -391,9 +403,9 @@ proc astToString(statements: seq[Statement]): string =
             result.add indent & "    expression: " & expressionToString(statement.expression, indentLevel + 1)
             result.add indent & "}\n"
             
-        elif statement of ContainerStatement:
-            let statement = ContainerStatement(statement)
-            result.add indent & "ContainerStatement {\n"
+        elif statement of ContainerAssignmentStatement:
+            let statement = ContainerAssignmentStatement(statement)
+            result.add indent & "ContainerAssignmentStatement {\n"
             result.add indent & "    identifier: " & tokenToString(statement.identifier, indentLevel + 1)
             if statement.parameters.len() != 0:
                 result.add indent & "    parameters: Token [\n"
@@ -403,8 +415,14 @@ proc astToString(statements: seq[Statement]): string =
             else:
                 result.add indent & "    parameters: Token []\n"
                 
-            result.add indent & "    expression: "
-            result.add expressionToString(statement.expression, indentLevel + 1)
+            result.add indent & "    expression: " & expressionToString(statement.expression, indentLevel + 1)
+            result.add indent & "}\n"
+        
+        elif statement of ContainerReassignmentStatement:
+            let statement = ContainerReassignmentStatement(statement)
+            result.add indent & "ContainerReassignmentStatement {\n"
+            result.add indent & "    identifier: " & tokenToString(statement.identifier, indentLevel + 1)
+            result.add indent & "    expression: " & expressionToString(statement.expression, indentLevel + 1)
             result.add indent & "}\n"
         
         elif statement of WhenStatement:
@@ -478,7 +496,7 @@ proc astToString(statements: seq[Statement]): string =
             result.add indent & "}\n"
 
         else:
-            return "Unknown Statment\n"
+            return indent & "Unknown Statment\n"
         
     result.add "Statement [\n"
     for statement in statements:
@@ -841,9 +859,17 @@ proc parser*(tokens: seq[Token]): seq[Statement] =
         let identifier: Token = tokens[index]
         index.inc()
         
-        var arguments: seq[Expression]
-        while isCurrentTokenExpressionStart():
-            arguments.add(expression())
+        var arguments: seq[Argument]
+        
+        while true:
+            if isCurrentTokenExpressionStart():
+                arguments.add(Argument(identifier: nil, value: expression()))
+            elif isCurrentTokenKind(TokenKind.Identifier) and tokens[index + 1].tokenKind == TokenKind.Tilde:
+                let identifier = tokens[index]
+                index.inc(2)
+                let value = expression()
+                arguments.add(Argument(identifier: identifier, value: value))
+            
             if isCurrentTokenKind(TokenKind.Comma): 
                 index.inc()
             else:
@@ -1219,21 +1245,32 @@ proc parser*(tokens: seq[Token]): seq[Statement] =
         ignore(TokenKind.Newline)
     
     
-    proc containerStatement(): Statement =
-        # ContainerStatement* = ref object of Statement
+    proc containerAssignmentStatement(): Statement =
+        # ContainerAssignmentStatement* = ref object of Statement
         #     identifier*: Token
-        #     parameters*: seq[Token]
+        #     parameters*: seq[Parameter]
         #     expression*: Expression
+        # 
+        # Parameter* = ref object
+        #     identifier*: Token
+        #     defaultValue*: Expression
         
         if isThisExpressionStatement2(): return expressionStatement()
         let identifier: Token = tokens[index]
         index.inc()
         
-        var parameters: seq[Token]
+        var parameters: seq[Parameter]
         while isCurrentTokenKind(TokenKind.Identifier):
-            parameters.add(tokens[index])
+            let identifier: Token = tokens[index]
             index.inc()
-        
+            var defaultValue: Expression = nil
+            
+            if isCurrentTokenKind(TokenKind.Tilde):
+                index.inc()
+                defaultValue = expression()
+            
+            parameters.add(Parameter(identifier: identifier, defaultValue: defaultValue))
+            
             if isCurrentTokenKind(TokenKind.Comma):
                 index.inc()
             else:
@@ -1246,8 +1283,25 @@ proc parser*(tokens: seq[Token]): seq[Statement] =
         
         let expression: Expression = expression()
         ignore(TokenKind.Newline)
-        return ContainerStatement(identifier: identifier, parameters: parameters, expression: expression)
+        return ContainerAssignmentStatement(identifier: identifier, parameters: parameters, expression: expression)
 
+    
+    proc containerReassignmentStatement(): Statement =
+        # ContainerReassignmentStatement* = ref object of Statement
+        #     identifier*: Token
+        #     expression*: Expression
+        
+        let identifier: Token = tokens[index]
+        index.inc()
+        
+        expect(TokenKind.Equal)
+        index.inc()
+        
+        let expression: Expression = expression()
+        ignore(TokenKind.Newline)
+        return ContainerReassignmentStatement(identifier: identifier, expression: expression)
+        
+    
     
     proc whenStatement(): Statement =
         # WhenStatement* = ref object of Statement
@@ -1439,7 +1493,10 @@ proc parser*(tokens: seq[Token]): seq[Statement] =
         # Statement* = ref object of RootObj
         
         if isCurrentTokenKind(TokenKind.Identifier):
-            return containerStatement()
+            if tokens[index + 1].tokenKind == TokenKind.Equal: 
+                return containerReassignmentStatement()
+            else:
+                return containerAssignmentStatement()
         elif isCurrentTokenKind(TokenKind.When):
             return whenStatement()
         elif isCurrentTokenKind(TokenKind.Loop):
@@ -1471,6 +1528,7 @@ proc parser*(tokens: seq[Token]): seq[Statement] =
 ##############################
 # ANALYSER
 ##############################
+
 
 
 proc analyser*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
@@ -1641,8 +1699,8 @@ proc analyser*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
             let statement =  ExpressionStatement(statement)
             discard analyseExpression(statement.expression)
         
-        elif statement of ContainerStatement:
-            let statement = ContainerStatement(statement)
+        elif statement of ContainerAssignmentStatement:
+            let statement = ContainerAssignmentStatement(statement)
             
             # First declare the container with empty types to break recursion
             defineContainer(statement.identifier.lexeme, statement.identifier.line, initHashSet[DataType]())
@@ -1704,8 +1762,6 @@ proc analyser*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
     # Global scope begin
     beginScope()
     
-    defineStandardLibrary()
-    
     # Main resolution process
     for statement in abstractSyntaxTree:
         analyseStatement(statement)
@@ -1722,7 +1778,17 @@ proc analyser*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
 # TRANSFORMER
 ##############################
 
+
+type 
+    ESForStatement* = ref object of Statement
+        initialisation*: Statement
+        condition*: Expression
+        update*: Statement
+
+
+
 proc transformer*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
+    
     return abstractSyntaxTree
 
 
