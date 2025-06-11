@@ -374,6 +374,7 @@ pre[class*="language-"] {
 
 .token.important, .token.keyword {
     color: var(--pink);
+    font-weight: 700;
 }
 
 .token.prolog {
@@ -433,7 +434,7 @@ pre[class*="language-"] {
 }
 
 .token.variable {
-    color: var(--comment);
+    color: var(--foreground);
 }
 
 .token.number {
@@ -442,6 +443,7 @@ pre[class*="language-"] {
 
 .token.operator {
     color: rgba(139, 233, 253, 1);
+    font-weight: 700;
 }
 
 .token.char {
