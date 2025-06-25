@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Utkrisht Programming Language</title>
-    <link rel="stylesheet" href="website/resources/styles/reset.css">
-    <link rel="stylesheet" href="website/resources/styles/markup.css">
-    <script src="./website/resources/scripts/prism.js" defer></script>
+    <link rel="stylesheet" href="/website/resources/styles/reset.css">
+    <link rel="stylesheet" href="/website/resources/styles/markup.css">
+    <script src="/website/resources/scripts/prism.js" defer></script>
 </head>
 <body>
     <header>
@@ -17,15 +18,15 @@
     
     <footer>
         <nav>
-            <a class="navigator" href="#home">
+            <a class="navigator" href="#" my-href="#home">
                 <inject-svg src="/website/resources/images/home.svg"></inject-svg>
                 <p>Home</p>
             </a>
-            <a class="navigator" href="#install">
+            <a class="navigator" href="#" my-href="#install">
                 <inject-svg src="/website/resources/images/install.svg"></inject-svg>
                 <p>Install</p>
             </a>
-            <a class="navigator" href="#learn">
+            <a class="navigator" href="#" my-href="#learn">
                 <inject-svg src="/website/resources/images/book.svg"></inject-svg>
                 <p>Learn</p>
             </a>
@@ -124,7 +125,7 @@
 <script>
     async function Navigate(page) {
         let container = document.querySelector("main");
-        document.querySelector("#current-page").innerHTML = page.capitalize()
+        document.querySelector("#current-page").innerHTML = page.charAt(0).toUpperCase() + page.slice(1)
         
         try {
             let response = await fetch("website/components/" + page + ".html");
@@ -141,7 +142,7 @@
     	link.addEventListener("click", function(event) {
     		event.preventDefault();
     		
-    		let page = this.getAttribute("href").substring(1);
+    		let page = this.getAttribute("my-href").substring(1);
     		
     		Navigate(page);
     	});
