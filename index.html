@@ -139,7 +139,9 @@
             container.innerHTML = html;
             Prism.highlightAll();
         } catch (error) {
-            console.error("Error fetching page: ", error);
+            const errorMessage = "Error fetching page: " + error
+            console.error(errorMessage);
+            container.innerHTML = errorMessage
         }
         
     }
