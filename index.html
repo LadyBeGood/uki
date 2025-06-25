@@ -14,15 +14,15 @@
     
     <footer>
         <nav>
-            <a class="navigator" href="#website/components/home">
+            <a class="navigator" href="#home">
                 <inject-svg src="./website/resources/images/home.svg"></inject-svg>
                 <p>Home</p>
             </a>
-            <a class="navigator" href="#website/components/install">
+            <a class="navigator" href="#install">
                 <inject-svg src="./website/resources/images/install.svg"></inject-svg>
                 <p>Install</p>
             </a>
-            <a class="navigator" href="#website/components/learn">
+            <a class="navigator" href="#learn">
                 <inject-svg src="./website/resources/images/book.svg"></inject-svg>
                 <p>Learn</p>
             </a>
@@ -124,8 +124,8 @@
     window.addEventListener("load", handleRoute);
     
     function handleRoute() {
-        let page = location.hash.slice(1) || "website/components/home";
-        Navigate(page);
+        let page = location.hash.slice(1) || "home";
+        Navigate("website/components/" + page);
     }
 
     
