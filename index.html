@@ -10,23 +10,19 @@
     <script src="./website/resources/scripts/prism.js" defer></script>
 </head>
 <body>
-    <header>
-        <div id="current-page">Home</div>
-    </header>
-    
     <main></main>
     
     <footer>
         <nav>
-            <a class="navigator" href="#" my-href="#home">
+            <a class="navigator" href="#website/components/home">
                 <inject-svg src="./website/resources/images/home.svg"></inject-svg>
                 <p>Home</p>
             </a>
-            <a class="navigator" href="#" my-href="#install">
+            <a class="navigator" href="#website/components/install">
                 <inject-svg src="./website/resources/images/install.svg"></inject-svg>
                 <p>Install</p>
             </a>
-            <a class="navigator" href="#" my-href="#learn">
+            <a class="navigator" href="#website/components/learn">
                 <inject-svg src="./website/resources/images/book.svg"></inject-svg>
                 <p>Learn</p>
             </a>
@@ -76,7 +72,7 @@
         font-weight: 450;
         letter-spacing: 0.4px;
         display: grid;
-        grid-template-rows: 45px 1fr 50px;
+        grid-template-rows: 1fr 50px;
     }
     
     header {
@@ -95,7 +91,7 @@
     main {
         background-color: var(--almost-black);
         overflow-y: scroll;
-        padding: 10px 15px;
+        padding: 20px 15px;
         line-height: 1.6;
         color: var(--almost-white);
     }
@@ -123,12 +119,22 @@
     
 </style>
 <script>
+    
+    window.addEventListener("hashchange", handleRoute);
+    window.addEventListener("load", handleRoute);
+    
+    function handleRoute() {
+        let page = location.hash.slice(1) || "website/components/home";
+        Navigate(page);
+    }
+
+    
     async function Navigate(page) {
         let container = document.querySelector("main");
-        document.querySelector("#current-page").innerHTML = page.charAt(0).toUpperCase() + page.slice(1)
+        
         
         try {
-            let response = await fetch("website/components/" + page + ".html");
+            let response = await fetch(page + ".html");
             let html = await response.text();
             container.innerHTML = html;
             Prism.highlightAll();
@@ -138,17 +144,7 @@
         
     }
     
-    document.querySelectorAll(".navigator").forEach(link => {
-    	link.addEventListener("click", function(event) {
-    		event.preventDefault();
-    		
-    		let page = this.getAttribute("my-href").substring(1);
-    		
-    		Navigate(page);
-    	});
-    });
-    
-    Navigate("home")
+
     
     
 
