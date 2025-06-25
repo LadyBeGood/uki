@@ -130,21 +130,24 @@
 
     
     async function Navigate(page) {
-        let container = document.querySelector("main");
-        
-        
-        try {
-            let response = await fetch(page + ".html");
-            let html = await response.text();
-            container.innerHTML = html;
-            Prism.highlightAll();
-        } catch (error) {
-            const errorMessage = "Error fetching page: " + error
-            console.error(errorMessage);
-            container.innerHTML = errorMessage
-        }
-        
+    const container = document.querySelector("main");
+    let loadingTimeout = setTimeout(() => {
+        container.innerHTML = "Loading...";
+    }, 100); // delay showing "Loading..." by 100ms
+
+    try {
+        const response = await fetch(page + ".html");
+        const html = await response.text();
+        clearTimeout(loadingTimeout);
+        container.innerHTML = html;
+        Prism.highlightAll();
+    } catch (error) {
+        clearTimeout(loadingTimeout);
+        const errorMessage = "Error fetching page: " + error;
+        console.error(errorMessage);
+        container.innerHTML = errorMessage;
     }
+}
     
 
     
