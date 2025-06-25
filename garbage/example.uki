@@ -1,3 +1,5 @@
+import uki/app
+
 
 is-prime num:
     when num !> 1
@@ -15,7 +17,7 @@ is-prime num:
 
 
 print-primes num-1, num-2: 
-    write "Prime numbers from |num-1| to |num-2| are:"
+    write "Prime numbers from || are:"
     
     loop num-1_num-2 with num
         when is-prime num
@@ -42,7 +44,6 @@ is-prime number:
             exit wrong
     
     exit right
-
 
 
 prime-checker:
@@ -79,10 +80,10 @@ prime-checker:
 
 render % origin 
     meta-title: "Prime Number Checker"
-    text-font: "Arial, sans-serif"
-    box-colour: "#f4f4f4"
+    text-font: Arial, sans-serif
+    box-colour: #F4F4F4
     box-inner-x: 15
-    custom-script: "<script src=\"https://kit.fontawesome.com/24c3243e9d.js\" crossorigin=\"anonymous\"></script>"
+    custom-script: <script src="https://kit.fontawesome.com/24c3243e9d.js" crossorigin="anonymous"></script>
 
     prime-checker centre
 
@@ -90,25 +91,28 @@ render % origin
 
 
 
-number?: es.parse-int "23"
-
-show message? ~ 10:
-    when message = none
-        error "This is not a number"
-    write message
-    
-    exit % element centre
-        text-content: message
-        box-border: ["2px", "solid", colours.green]
-        
 
 
-show number
+meta-title: "Title"
+meta-description: "Page description"
+meta-robots: "index, follow"
+meta-goopen-graphlebot: "index, follow"
+meta-theme-colour: "#ffffff"
+meta-colour-scheme: "light dark"
+meta-format-detection: "telephone = no"
+meta-referrer: "no-referrer"
+meta-application-name: "App Name"
+meta-http-equiv="refresh: "30"
 
+open-graph-title: "Open Graph Title"
+open-graph-description: "Open Graph Description"
+open-graph-type: "website"
+open-graph-url: "https://example.com"
+open-graph-image: "https://example.com/image.jpg"
 
-
-
-
-
+twitter-card: "summary_large_image"
+twitter-title: "Twitter Title"
+twitter-description: "Twitter Description"
+twitter-image: "https://example.com/image.jpg"
 
 

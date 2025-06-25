@@ -1,10 +1,10 @@
-# Phantom Type Checking: Constraint-Guided Static Analysis for Dynamically Typed Languages
+# Enigma Type Checking: Constraint-Guided Static Analysis for Dynamically Typed Languages
 
 ---
 
 ## Overview
 
-**Phantom Type Checking** is a type analysis strategy for dynamically typed but strongly enforced languages. It enables **compile-time type checking** without requiring type annotations or a full static type system. The approach works by inferring types based on **how values are used**—informed entirely by the semantics of built-in operations and functions—while preserving the flexibility of dynamic types.
+**Enigma Type Checking** is a type analysis strategy for dynamically typed but strongly enforced languages. It enables **compile-time type checking** without requiring type annotations or a full static type system. The approach works by inferring types based on **how values are used**—informed entirely by the semantics of built-in operations and functions—while preserving the flexibility of dynamic types.
 
 This method targets language designs that transpile to loosely typed backends like JavaScript, aiming to eliminate a large class of type errors before runtime while keeping the surface language dynamic and minimal.
 
@@ -31,7 +31,7 @@ These constraints form the basis for all static checking and inference.
 
 ### 2. Type Sets
 
-Rather than assigning a single type to a variable, Phantom assigns a **set of possible types** (`{Number}`, `{String, Boolean}`, etc.). This supports union-type reasoning without explicit union types in the syntax.
+Rather than assigning a single type to a variable, Enigma type checker assigns a **set of possible types** (`{Number}`, `{String, Boolean}`, etc.). This supports union-type reasoning without explicit union types in the syntax.
 
 - If a variable's type set is a single valid match for an operation → **allowed**
 - If the type set conflicts with the required signature → **compile-time error**
@@ -98,7 +98,7 @@ This fallback is minimal and conservative—most well-structured code receives f
 
 ## Why It Matters
 
-Phantom Type Checking is:
+Enigma Type Checking is:
 
 - **Annotation-free**: No burden on the programmer  
 - **Flow-sensitive**: Types are inferred from control/data flow  
@@ -124,12 +124,13 @@ Phantom Type Checking is:
 | Static Typing (e.g. TypeScript) | Optional/Required | Yes              | No                | Yes            | Limited        |
 | Gradual Typing         | Optional         | Partial           | Yes               | Partial         | Yes (narrow)   |
 | Dynamic Typing         | No               | No                | Yes               | No              | No             |
-| **Phantom Typing**     | **No**           | **Yes (partial)** | **Yes (fallback)**| **Yes**         | **Yes**         |
+| **Enigma Typing**     | **No**           | **Yes (partial)** | **Yes (fallback)**| **Yes**         | **Yes**         |
 
 ---
 
 ## Conclusion
 
-**Phantom Type Checking** sits between dynamic and static typing. It reuses the dynamic semantics of a language as a type system, using operation constraints as a form of *latent specification*. The result is a lightweight yet powerful mechanism for catching type errors in dynamic code—without the cost of verbosity, without loss of expressiveness, and without runtime overreach.
+**Enigma Type Checking** sits between dynamic and static typing. It reuses the dynamic semantics of a language as a type system, using operation constraints as a form of *latent specification*. The result is a lightweight yet powerful mechanism for catching type errors in dynamic code—without the cost of verbosity, without loss of expressiveness, and without runtime overreach.
 
 It offers a compelling alternative to gradual typing for language designers targeting safety without compromising minimalism.
+

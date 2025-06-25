@@ -1,0 +1,1187 @@
+
+.markup {
+    word-wrap: break-word;
+}
+
+
+.markup details,
+.markup figcaption,
+.markup figure {
+    display: block;
+}
+
+.markup summary {
+    display: list-item;
+}
+
+.markup [hidden] {
+    display: none !important;
+}
+
+.markup a {
+    background-color: transparent;
+    color: #4493f8;
+    text-decoration: none;
+}
+
+.markup abbr[title] {
+    border-bottom: none;
+    -webkit-text-decoration: underline dotted;
+    text-decoration: underline dotted;
+}
+
+.markup b,
+.markup strong {
+    font-weight: 600;
+}
+
+.markup dfn {
+    font-style: italic;
+}
+
+.markup h1 {
+    margin: .67em 0;
+    font-weight: 600;
+    padding-bottom: .3em;
+    font-size: 2em;
+    border-bottom: 1px solid #3d444db3;
+}
+
+.markup mark {
+    background-color: #bb800926;
+    color: #f0f6fc;
+}
+
+.markup small {
+    font-size: 90%;
+}
+
+.markup sub,
+.markup sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+.markup sub {
+    bottom: -0.25em;
+}
+
+.markup sup {
+    top: -0.5em;
+}
+
+.markup img {
+    border-style: none;
+    max-width: 100%;
+    box-sizing: content-box;
+}
+
+
+
+.markup figure {
+    margin: 1em 2.5rem;
+}
+
+.markup hr {
+    box-sizing: content-box;
+    overflow: hidden;
+    background: transparent;
+    border-bottom: 1px solid #3d444db3;
+    height: .25em;
+    padding: 0;
+    margin: 1.5rem 0;
+    background-color: #3d444d;
+    border: 0;
+}
+
+
+.markup [type=checkbox],
+.markup [type=radio] {
+    box-sizing: border-box;
+    padding: 0;
+}
+
+.markup a:hover {
+    text-decoration: underline;
+}
+
+.markup ::placeholder {
+    color: #9198a1;
+    opacity: 1;
+}
+
+.markup hr::before {
+    display: table;
+    content: "";
+}
+
+.markup hr::after {
+    display: table;
+    clear: both;
+    content: "";
+}
+
+.markup table {
+    border-spacing: 0;
+    border-collapse: collapse;
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow: auto;
+    font-variant: tabular-nums;
+}
+
+.markup td,
+.markup th {
+    padding: 0;
+}
+
+.markup details summary {
+    cursor: pointer;
+}
+
+.markup a:focus,
+.markup [role=button]:focus,
+.markup input[type=radio]:focus,
+.markup input[type=checkbox]:focus {
+    outline: 2px solid #1f6feb;
+    outline-offset: -2px;
+    box-shadow: none;
+}
+
+.markup a:focus:not(:focus-visible),
+.markup [role=button]:focus:not(:focus-visible),
+.markup input[type=radio]:focus:not(:focus-visible),
+.markup input[type=checkbox]:focus:not(:focus-visible) {
+    outline: solid 1px transparent;
+}
+
+.markup a:focus-visible,
+.markup [role=button]:focus-visible,
+.markup input[type=radio]:focus-visible,
+.markup input[type=checkbox]:focus-visible {
+    outline: 2px solid #1f6feb;
+    outline-offset: -2px;
+    box-shadow: none;
+}
+
+.markup a:not([class]):focus,
+.markup a:not([class]):focus-visible,
+.markup input[type=radio]:focus,
+.markup input[type=radio]:focus-visible,
+.markup input[type=checkbox]:focus,
+.markup input[type=checkbox]:focus-visible {
+    outline-offset: 0;
+}
+
+.markup h1,
+.markup h2,
+.markup h3,
+.markup h4,
+.markup h5,
+.markup h6 {
+    margin-top: 5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.markup h2 {
+    font-weight: 600;
+    padding-bottom: .3em;
+    font-size: 1.5em;
+    border-bottom: 1px solid #3d444db3;
+}
+
+.markup h3 {
+    font-weight: 600;
+    font-size: 1.25em;
+}
+
+.markup h4 {
+    font-weight: 600;
+    font-size: 1em;
+}
+
+.markup h5 {
+    font-weight: 600;
+    font-size: .875em;
+}
+
+.markup h6 {
+    font-weight: 600;
+    font-size: .85em;
+    color: #9198a1;
+}
+
+.markup p {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.markup blockquote {
+    margin: 0;
+    padding: 0 1em;
+    color: #9198a1;
+    border-left: .25em solid #3d444d;
+}
+
+.markup ul,
+.markup ol {
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-left: 2em;
+}
+
+.markup ol ol,
+.markup ul ol {
+    list-style-type: lower-roman;
+}
+
+.markup ul ul ol,
+.markup ul ol ol,
+.markup ol ul ol,
+.markup ol ol ol {
+    list-style-type: lower-alpha;
+}
+
+.markup dd {
+    margin-left: 0;
+}
+
+.markup .mr-2 {
+    margin-right: 0.5rem !important;
+}
+
+.markup::before {
+    display: table;
+    content: "";
+}
+
+.markup::after {
+    display: table;
+    clear: both;
+    content: "";
+}
+
+.markup>*:first-child {
+    margin-top: 0 !important;
+}
+
+.markup>*:last-child {
+    margin-bottom: 0 !important;
+}
+
+.markup a:not([href]) {
+    color: inherit;
+    text-decoration: none;
+}
+
+.markup .absent {
+    color: #f85149;
+}
+
+.markup .anchor {
+    float: left;
+    padding-right: 0.25rem;
+    margin-left: -20px;
+    line-height: 1;
+}
+
+.markup .anchor:focus {
+    outline: none;
+}
+
+.markup p,
+.markup blockquote,
+.markup ul,
+.markup ol,
+.markup dl,
+.markup table,
+.markup details {
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+.markup blockquote>:first-child {
+    margin-top: 0;
+}
+
+.markup blockquote>:last-child {
+    margin-bottom: 0;
+}
+
+
+.markup summary h1,
+.markup summary h2,
+.markup summary h3,
+.markup summary h4,
+.markup summary h5,
+.markup summary h6 {
+    display: inline-block;
+}
+
+.markup summary h1 .anchor,
+.markup summary h2 .anchor,
+.markup summary h3 .anchor,
+.markup summary h4 .anchor,
+.markup summary h5 .anchor,
+.markup summary h6 .anchor {
+    margin-left: -40px;
+}
+
+.markup summary h1,
+.markup summary h2 {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.markup ul.no-list,
+.markup ol.no-list {
+    padding: 0;
+    list-style-type: none;
+}
+
+.markup ol[type="a s"] {
+    list-style-type: lower-alpha;
+}
+
+.markup ol[type="A s"] {
+    list-style-type: upper-alpha;
+}
+
+.markup ol[type="i s"] {
+    list-style-type: lower-roman;
+}
+
+.markup ol[type="I s"] {
+    list-style-type: upper-roman;
+}
+
+.markup ol[type="1"] {
+    list-style-type: decimal;
+}
+
+.markup div>ol:not([type]) {
+    list-style-type: decimal;
+}
+
+.markup ul ul,
+.markup ul ol,
+.markup ol ol,
+.markup ol ul {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.markup li>p {
+    margin-top: 1rem;
+}
+
+.markup li+li {
+    margin-top: .25em;
+}
+
+.markup dl {
+    padding: 0;
+}
+
+.markup dl dt {
+    padding: 0;
+    margin-top: 1rem;
+    font-size: 1em;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.markup dl dd {
+    padding: 0 1rem;
+    margin-bottom: 1rem;
+}
+
+.markup table th {
+    font-weight: 600;
+}
+
+.markup table th,
+.markup table td {
+    padding: 6px 13px;
+    border: 1px solid #3d444d;
+}
+
+.markup table td>:last-child {
+    margin-bottom: 0;
+}
+
+.markup table tr {
+    background-color: #0d1117;
+    border-top: 1px solid #3d444db3;
+}
+
+.markup table tr:nth-child(2n) {
+    background-color: #151b23;
+}
+
+.markup table img {
+    background-color: transparent;
+}
+
+.markup img[align=right] {
+    padding-left: 20px;
+}
+
+.markup img[align=left] {
+    padding-right: 20px;
+}
+
+.markup .emoji {
+    max-width: none;
+    vertical-align: text-top;
+    background-color: transparent;
+}
+
+.markup span.frame {
+    display: block;
+    overflow: hidden;
+}
+
+.markup span.frame>span {
+    display: block;
+    float: left;
+    width: auto;
+    padding: 7px;
+    margin: 13px 0 0;
+    overflow: hidden;
+    border: 1px solid #3d444d;
+}
+
+.markup span.frame span img {
+    display: block;
+    float: left;
+}
+
+.markup span.frame span span {
+    display: block;
+    padding: 5px 0 0;
+    clear: both;
+    color: #f0f6fc;
+}
+
+.markup span.align-center {
+    display: block;
+    overflow: hidden;
+    clear: both;
+}
+
+.markup span.align-center>span {
+    display: block;
+    margin: 13px auto 0;
+    overflow: hidden;
+    text-align: center;
+}
+
+.markup span.align-center span img {
+    margin: 0 auto;
+    text-align: center;
+}
+
+.markup span.align-right {
+    display: block;
+    overflow: hidden;
+    clear: both;
+}
+
+.markup span.align-right>span {
+    display: block;
+    margin: 13px 0 0;
+    overflow: hidden;
+    text-align: right;
+}
+
+.markup span.align-right span img {
+    margin: 0;
+    text-align: right;
+}
+
+.markup span.float-left {
+    display: block;
+    float: left;
+    margin-right: 13px;
+    overflow: hidden;
+}
+
+.markup span.float-left span {
+    margin: 13px 0 0;
+}
+
+.markup span.float-right {
+    display: block;
+    float: right;
+    margin-left: 13px;
+    overflow: hidden;
+}
+
+.markup span.float-right>span {
+    display: block;
+    margin: 13px auto 0;
+    overflow: hidden;
+    text-align: right;
+}
+
+
+
+
+
+.markup [role=button]:focus:not(:focus-visible),
+.markup [role=tabpanel][tabindex="0"]:focus:not(:focus-visible),
+.markup button:focus:not(:focus-visible),
+.markup summary:focus:not(:focus-visible),
+.markup a:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
+}
+
+.markup [tabindex="0"]:focus:not(:focus-visible),
+.markup details-dialog:focus:not(:focus-visible) {
+    outline: none;
+}
+
+.markup g-emoji {
+    display: inline-block;
+    min-width: 1ch;
+    font-size: 1em;
+    font-style: normal !important;
+    font-weight: 400;
+    line-height: 1;
+    vertical-align: -0.075em;
+}
+
+.markup g-emoji img {
+    width: 1em;
+    height: 1em;
+}
+
+.markup .task-list-item {
+    list-style-type: none;
+}
+
+.markup .task-list-item label {
+    font-weight: 400;
+}
+
+.markup .task-list-item.enabled label {
+    cursor: pointer;
+}
+
+.markup .task-list-item+.task-list-item {
+    margin-top: 0.25rem;
+}
+
+.markup .task-list-item .handle {
+    display: none;
+}
+
+.markup .task-list-item-checkbox {
+    margin: 0 .2em .25em -1.4em;
+    vertical-align: middle;
+}
+
+.markup ul:dir(rtl) .task-list-item-checkbox {
+    margin: 0 -1.6em .25em .2em;
+}
+
+.markup ol:dir(rtl) .task-list-item-checkbox {
+    margin: 0 -1.6em .25em .2em;
+}
+
+.markup .contains-task-list:hover .task-list-item-convert-container,
+.markup .contains-task-list:focus-within .task-list-item-convert-container {
+    display: block;
+    width: auto;
+    height: 24px;
+    overflow: visible;
+    clip: auto;
+}
+
+.markup ::-webkit-calendar-picker-indicator {
+    filter: invert(50%);
+}
+
+.markup .markup-alert {
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    color: inherit;
+    border-left: .25em solid #3d444d;
+}
+
+.markup .markup-alert>:first-child {
+    margin-top: 0;
+}
+
+.markup .markup-alert>:last-child {
+    margin-bottom: 0;
+}
+
+.markup .markup-alert .markup-alert-title {
+    display: flex;
+    font-weight: 500;
+    align-items: center;
+    line-height: 1;
+}
+
+.markup .markup-alert.markup-alert-note {
+    border-left-color: #1f6feb;
+}
+
+.markup .markup-alert.markup-alert-note .markup-alert-title {
+    color: #4493f8;
+}
+
+.markup .markup-alert.markup-alert-important {
+    border-left-color: #8957e5;
+}
+
+.markup .markup-alert.markup-alert-important .markup-alert-title {
+    color: #ab7df8;
+}
+
+.markup .markup-alert.markup-alert-warning {
+    border-left-color: #9e6a03;
+}
+
+.markup .markup-alert.markup-alert-warning .markup-alert-title {
+    color: #d29922;
+}
+
+.markup .markup-alert.markup-alert-tip {
+    border-left-color: #238636;
+}
+
+.markup .markup-alert.markup-alert-tip .markup-alert-title {
+    color: #3fb950;
+}
+
+.markup .markup-alert.markup-alert-caution {
+    border-left-color: #da3633;
+}
+
+.markup .markup-alert.markup-alert-caution .markup-alert-title {
+    color: #f85149;
+}
+
+.markup>*:first-child>.heading-element:first-child {
+    margin-top: 0 !important;
+}
+
+
+
+
+
+
+
+
+/* PrismJS 1.14.0
+http://prismjs.com/download.html#themes=prism&languages=markup+css+clike+javascript+abap+actionscript+ada+apacheconf+apl+applescript+c+arff+asciidoc+asm6502+aspnet+autohotkey+autoit+bash+basic+batch+bison+brainfuck+bro+cpp+csharp+arduino+coffeescript+clojure+ruby+csp+css-extras+d+dart+diff+django+docker+eiffel+elixir+elm+markup-templating+erlang+fsharp+flow+fortran+gedcom+gherkin+git+glsl+go+graphql+groovy+haml+handlebars+haskell+haxe+http+hpkp+hsts+ichigojam+icon+inform7+ini+io+j+java+jolie+json+julia+keyman+kotlin+latex+less+liquid+lisp+livescript+lolcode+lua+makefile+markdown+erb+matlab+mel+mizar+monkey+n4js+nasm+nginx+nim+nix+nsis+objectivec+ocaml+opencl+oz+parigp+parser+pascal+perl+php+php-extras+sql+powershell+processing+prolog+properties+protobuf+pug+puppet+pure+python+q+qore+r+jsx+typescript+renpy+reason+rest+rip+roboconf+crystal+rust+sas+sass+scss+scala+scheme+smalltalk+smarty+plsql+soy+stylus+swift+tcl+textile+twig+tsx+vbnet+velocity+verilog+vhdl+vim+visual-basic+wasm+wiki+xeora+xojo+yaml&plugins=line-numbers+toolbar+show-language */
+/**
+ * prism.js default theme for JavaScript, CSS and HTML
+ * Based on dabblet (http://dabblet.com)
+ * @author Lea Verou
+ */
+
+/*
+* Dracula Theme for Prism.JS
+*
+* @author Gustavo Costa
+* e-mail: gusbemacbe@gmail.com
+*
+* @contributor Jon Leopard
+* e-mail: jonlprd@gmail.com
+*
+* @license MIT 2016-2020
+*/
+
+/* Scrollbars */
+
+:root {
+    --background: #282A36;
+    --comment:        #6272A4;
+    --foreground: #F8F8F2;
+    --selection:    #44475A;
+
+    --cyan:             #8BE9FD;
+    --green:            #50FA7B;
+    --orange:         #FFB86C;
+    --pink:             #FF79C6;
+    --purple:         #BD93F9;
+    --red:                #FF5555;
+    --yellow:         #F1FA8C;
+
+    /* Transparency */
+hsl(206, 82%, 20%)
+    /** 30% of transparency **/
+    --background-30: #282A3633;
+    --comment-30:        #6272A433;
+    --foreground-30: #F8F8F233;
+    --selection-30:    #44475A33;
+
+    --cyan-30:             #8BE9FD33;
+    --green-30:            #50FA7B33;
+    --orange-30:         #FFB86C33;
+    --pink-30:             #FF79C633;
+    --purple-30:         #BD93F933;
+    --red-30:                #FF555533;
+    --yellow-30:         #F1FA8C33;
+
+    /** 40% of transparency **/
+    --background-40: #282A3666;
+    --comment-40:        #6272A466;
+    --foreground-40: #F8F8F266;
+    --selection-40:    #44475A66;
+
+    --cyan-40:             #8BE9FD66;
+    --green-40:            #50FA7B66;
+    --orange-40:         #FFB86C66;
+    --pink-40:             #FF79C666;
+    --purple-40:         #BD93F966;
+    --red-40:                #FF555566;
+    --yellow-40:         #F1FA8C66;
+}
+
+pre::-webkit-scrollbar {
+    width: 14px;
+}
+
+pre::-webkit-scrollbar-track {
+    background-color: var(--comment);
+    border-radius: 0px;
+}
+
+pre::-webkit-scrollbar-thumb {
+    background-color: var(--purple);
+    border-radius: 0px;
+}
+
+/* Selection */
+
+pre[class*="language-"]::-moz-selection,
+pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection,
+code[class*="language-"] ::-moz-selection {
+    text-shadow: none;
+    overflow-x: scroll;
+    background-color: var(--selection);
+}
+
+pre[class*="language-"]::selection,
+pre[class*="language-"] ::selection,
+code[class*="language-"]::selection,
+code[class*="language-"] ::selection {
+    text-shadow: none;
+    background-color: var(--selection);
+}
+
+/* Line numbers */
+
+pre.line-numbers {
+    position: relative;
+    padding-left: 3.8em;
+    counter-reset: linenumber;
+}
+
+pre.line-numbers > code {
+    position: relative;
+    white-space: inherit;
+}
+
+.line-numbers .line-numbers-rows {
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    font-size: 100%;
+    left: -3.8em;
+    width: 3em; /* works for line-numbers below 1000 lines */
+    letter-spacing: -1px;
+    border-right: 1px solid #999;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.line-numbers-rows > span {
+    pointer-events: none;
+    display: block;
+    counter-increment: linenumber;
+}
+
+.line-numbers-rows > span:before {
+    content: counter(linenumber);
+    color: #999;
+    display: block;
+    padding-right: 0.8em;
+    text-align: right;
+}
+
+/* Toolbar for copying */
+
+div.code-toolbar {
+    position: relative;
+}
+
+div.code-toolbar > .toolbar {
+    position: absolute;
+    top: 0.3em;
+    right: 0.2em;
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+}
+
+div.code-toolbar:hover > .toolbar {
+    opacity: 1;
+}
+
+div.code-toolbar > .toolbar .toolbar-item {
+    display: inline-block;
+    padding-right: 20px;
+}
+
+div.code-toolbar > .toolbar a {
+    cursor: pointer;
+}
+
+div.code-toolbar > .toolbar button {
+    background: none;
+    border: 0;
+    color: inherit;
+    font: inherit;
+    line-height: normal;
+    overflow: visible;
+    padding: 0;
+    -webkit-user-select: none; /* for button */
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+div.code-toolbar > .toolbar a,
+div.code-toolbar > .toolbar button,
+div.code-toolbar > .toolbar span {
+    color: var(--foreground);
+    font-size: 0.8em;
+    padding: 0.5em;
+    background: var(--comment);
+    border-radius: 0.5em;
+}
+
+div.code-toolbar > .toolbar a:hover,
+div.code-toolbar > .toolbar a:focus,
+div.code-toolbar > .toolbar button:hover,
+div.code-toolbar > .toolbar button:focus,
+div.code-toolbar > .toolbar span:hover,
+div.code-toolbar > .toolbar span:focus {
+    color: inherit;
+    text-decoration: none;
+    background-color: var(--green);
+}
+
+/* Remove text shadow for printing */
+
+@media print {
+    code[class*="language-"],
+    pre[class*="language-"] 
+    {
+        text-shadow: none;
+    }
+}
+
+code[class*="language-"],
+pre[class*="language-"] {
+    color: var(--foreground);
+    background: var(--background);
+    text-shadow: none;
+    font-family: "JetBrains Mono", monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+}
+
+/* Code blocks */
+
+pre[class*="language-"] {
+    background: var(--background);
+    border-radius: 0.5em;
+    padding: 1em;
+    margin: 0.5em 0;
+    overflow: auto;
+    height: auto;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+    background: var(--background);
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+    padding: 1px 7px;
+    border-radius: 0.3em;
+    white-space: normal;
+}
+
+/* Code box limit */
+
+.limit-300 {
+    height: 300px !important;
+}
+
+.limit-300 {
+    height: 400px !important;
+}
+
+.limit-500 {
+    height: 500px !important;
+}
+
+.limit-600 {
+    height: 600px !important;
+}
+
+.limit-700 {
+    height: 700px !important;
+}
+
+.limit-800 {
+    height: 800px !important;
+}
+
+.language-css {
+    color: var(--purple);
+}
+
+.token {
+    color: var(--pink);
+}
+
+.language-css .token {
+    color: var(--pink);
+}
+
+.token.script {
+    color: var(--foreground);
+}
+
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+.token.atrule, .token.attr-name, .token.attr-value {
+    color: var(--green);
+}
+
+.language-css .token.atrule {
+    color: var(--purple);
+}
+
+.language-html .token.attr-value, .language-markup .token.attr-value {
+    color: var(--yellow);
+}
+
+.token.boolean {
+    color: var(--purple);
+}
+
+.token.builtin, .token.class-name {
+    color: var(--cyan);
+}
+
+.token.comment {
+    color: var(--comment);
+}
+
+.token.constant {
+    color: var(--purple);
+}
+
+.language-javascript .token.constant {
+    color: var(--orange);
+    font-style: italic;
+}
+
+.token.entity {
+    color: var(--pink);
+}
+
+.language-css .token.entity {
+    color: var(--green);
+}
+
+.language-html .token.entity.named-entity {
+    color: var(--purple);
+}
+
+.language-html .token.entity:not(.named-entity) {
+    color: var(--pink);
+}
+
+.language-markup .token.entity.named-entity {
+    color: var(--purple);
+}
+
+.language-markup .token.entity:not(.named-entity) {
+    color: var(--pink);
+}
+
+.token.function {
+    color: var(--green);
+}
+
+.language-css .token.function {
+    color: var(--cyan);
+}
+
+.token.important, .token.keyword {
+    color: var(--pink);
+}
+
+.token.prolog {
+    color: var(--foreground);
+}
+
+.token.property {
+    color: var(--orange);
+}
+
+.language-css .token.property {
+    color: var(--cyan);
+}
+
+.token.punctuation {
+    color: var(--pink);
+}
+
+.language-css .token.punctuation {
+    color: var(--orange);
+}
+
+.language-html .token.punctuation, .language-markup .token.punctuation {
+    color: var(--foreground);
+}
+
+.token.selector {
+    color: var(--pink);
+}
+
+.language-css .token.selector {
+    color: var(--green);
+}
+
+.token.regex {
+    color: var(--red);
+}
+
+.language-css .token.rule:not(.atrule) {
+    color: var(--foreground);
+}
+
+.token.string {
+    color: var(--yellow);
+}
+
+.token.tag {
+    color: var(--pink);
+}
+
+.token.url {
+    color: var(--cyan);
+}
+
+.language-css .token.url {
+    color: var(--orange);
+}
+
+.token.variable {
+    color: var(--foreground);
+}
+
+.token.number {
+    color: rgba(189, 147, 249, 1);
+}
+
+.token.operator {
+    color: rgba(139, 233, 253, 1);
+}
+
+.token.char {
+    color: rgba(255, 135, 157, 1);
+}
+
+.token.symbol {
+    color: rgba(255, 184, 108, 1);
+}
+
+.token.deleted {
+    color: #e2777a;
+}
+
+.token.namespace {
+    color: #e2777a;
+}
+
+/* Line Highlighter */
+
+.highlight-line {
+    color: inherit;
+    display: inline-block;
+    text-decoration: none;
+
+    border-radius: 4px;
+    padding: 2px 10px;
+}
+
+.highlight-line:empty:before {
+    content: " ";
+}
+
+.highlight-line:not(:last-child) {
+    min-width: 100%;
+}
+
+.highlight-line .highlight-line:not(:last-child) {
+    min-width: 0;
+}
+
+.highlight-line-isdir {
+    color: var(--foreground);
+    background-color: var(--selection-30);
+}
+
+.highlight-line-active {
+    background-color: var(--comment-30);
+}
+
+.highlight-line-add {
+    background-color: var(--green-30);
+}
+
+.highlight-line-remove {
+    background-color: var(--red-30);
+}
+ 

@@ -5,103 +5,174 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Utkrisht Programming Language</title>
-    
-    <meta name="darkreader-lock">
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet">
-    
-    <script src="website/prism.js" defer></script>
-    <script src="website/script.js" defer></script>
-    
-    <link rel="stylesheet" href="website/prism.css">
-    <link rel="stylesheet" href="website/style.css">
-
+    <link rel="stylesheet" href="website/resources/styles/reset.css">
+    <link rel="stylesheet" href="website/resources/styles/markup.css">
+    <script src="./website/resources/scripts/prism.js" defer></script>
 </head>
 <body>
     <header>
-        Tutorial
+        <div id="current-page">Home</div>
     </header>
     
-    <main>
-        <div class="container">
-            
-            <pre><code class="language-utkrisht">
-is-prime num:
-    when num !> 1
-        exit wrong
-    else num = 2
-        exit right
-    else (remainder num, 2) = 0
-        exit wrong
-
-    loop 3_(power num, 0.5)_2 with i
-        when (remainder num, i) = 0
-            exit wrong
-
-    exit right
-
-
-# Print the oprime numbers
-print-primes num-1, num-2: 
-    write "Prime numbers from |num-1| to |num-2| are:"
+    <main></main>
     
-    loop num-1_num-2 with num
-        when is-prime num
-            write num
-
-
-num-1: to-number prompt "What is your 1st number" 
-num-2: to-number prompt "What is your 2nd number"
-
-print-primes num-1, num-2
-
-</code></pre>
-
-<pre><code class="language-utkrisht">aaa bbb ccc ddd</code></pre>
-<pre><code class="language-javascript">
-function isPrime(num) {
-    if (num <= 1) {
-        return false;
-    }
-    if (num === 2) {
-        return true;
-    }
-    if (num % 2 === 0) {
-        return false;
-    }
-
-    for (let i = 3; i <= Math.sqrt(num); i += 2) {
-        if (num % i === 0) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function printPrimes(num1, num2) {
-    console.log(`Prime numbers from ${num1} to ${num2} are:`);
-
-    for (let num = num1; num <= num2; num++) {
-        if (isPrime(num)) {
-            console.log(num);
-        }
-    }
-}
-
-const num1 = Number(prompt("What is your 1st number"));
-const num2 = Number(prompt("What is your 2nd number"));
-
-printPrimes(num1, num2);
-</code></pre>
-        </div>
-    </main>
-
-
+    <footer>
+        <nav>
+            <a class="navigator" href="#home">
+                <inject-svg src="/website/resources/images/home.svg"></inject-svg>
+                <p>Home</p>
+            </a>
+            <a class="navigator" href="#install">
+                <inject-svg src="/website/resources/images/install.svg"></inject-svg>
+                <p>Install</p>
+            </a>
+            <a class="navigator" href="#learn">
+                <inject-svg src="/website/resources/images/book.svg"></inject-svg>
+                <p>Learn</p>
+            </a>
+        </nav>
+    </footer>
 </body>
+
+<style>
+    :root {
+        --almost-white: #F2F2F2;
+        --almost-black: #17181C;
+        --black: #050505;
+        --steel: #9194A1;
+        --azure: hsl(206, 95%, 22%);
+    }
+    
+    @font-face {
+        font-family: "JetBrains Mono";
+        src: url("./website/resources/fonts/jetbrains-mono/jetbrains-mono-variable.woff2") format("woff2");
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+    }
+    
+    @font-face {
+        font-family: "Pretendard";
+        src: url("./website/resources/fonts/pretendard/pretendard-variable.woff2") format("woff2");
+        font-weight: 100 900;
+        font-style: normal;
+        font-display: swap;
+    }
+    
+    
+    html {
+        background-color: green;
+    }
+    
+    body {
+        background-color: var(--almost-white);
+        height: 100vh;
+        height: 100svh;
+        width: 100vw;
+        color: var(--light-gray);
+        font-size: 16px;
+        font-family: Pretendard;
+        color: black;
+        font-weight: 450;
+        letter-spacing: 0.4px;
+        display: grid;
+        grid-template-rows: 45px 1fr 50px;
+    }
+    
+    header {
+        background-color: var(--azure);
+        display: flex;
+        align-items: center;
+        padding-inline: 15px;
+    }
+    
+    header #current-page {
+        color: var(--almost-white);
+        font-weight: bold;
+        font-size: 20px;
+    }
+    
+    main {
+        background-color: var(--almost-black);
+        overflow-y: scroll;
+        padding: 10px 15px;
+        line-height: 1.6;
+        color: var(--almost-white);
+    }
+    
+    
+    footer {
+        background-color: var(--azure);
+    }
+    
+    footer nav {
+        height: 100%;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-around;
+        align-items: center;
+    }
+    
+    footer .navigator {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: var(--almost-white);
+    }
+    
+    
+</style>
+<script>
+    async function Navigate(page) {
+        let container = document.querySelector("main");
+        document.querySelector("#current-page").innerHTML = page.capitalize()
+        
+        try {
+            let response = await fetch("website/components/" + page + ".html");
+            let html = await response.text();
+            container.innerHTML = html;
+            Prism.highlightAll();
+        } catch (error) {
+            console.error("Error fetching page: ", error);
+        }
+        
+    }
+    
+    document.querySelectorAll(".navigator").forEach(link => {
+    	link.addEventListener("click", function(event) {
+    		event.preventDefault();
+    		
+    		let page = this.getAttribute("href").substring(1);
+    		
+    		Navigate(page);
+    	});
+    });
+    
+    Navigate("home")
+    
+    
+
+
+
+    document.querySelectorAll("inject-svg").forEach(async (element) => {
+        const name = element.getAttribute("src");
+        const res = await fetch(name);
+        const svgText = await res.text();
+    
+        const parser = new DOMParser();
+        const svg = parser.parseFromString(svgText, "image/svg+xml").documentElement;
+        element.replaceWith(svg);
+    });
+
+</script>
 </html>
+
+
+
+
+
+
+
 
 
 

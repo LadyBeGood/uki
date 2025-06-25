@@ -1,0 +1,36 @@
+
+
+
+<arcticle class="markup">
+
+<h2>Prerequisites</h2>
+<a href="https://nim-lang.org/install.html">Install Nim</a>
+
+
+
+<h2>Steps</h2>
+<ol>
+    <li>
+        Clone this repository
+        <pre><code class="language-sh">git clone https://github.com/LadyBeGood/utkrisht.git</code></pre>
+    </li>
+    <li>
+        Compile the compiler
+        <pre><code class="language-sh">nim c --d:release --opt:speed --passC:-flto --out:uki --verbosity:0 ./utkrisht/compiler.nim</code></pre>
+    </li>
+    <li>
+        (Optional) Clean up the repository after successful compilation:
+        <pre><code class="language-sh">rm -rf utkrisht</code></pre>
+    </li>
+</ol>
+
+    
+<h2>Example usage</h2>
+
+Compile a <code class="language-sh">input.uki</code> file to <code class="language-sh">output.js</code> file:
+<pre><code class="language-sh">./uki input.uki output.js</code></pre>
+
+
+
+    
+</arcticle>

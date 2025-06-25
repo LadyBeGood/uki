@@ -1,0 +1,99 @@
+
+<head>
+    <link rel="stylesheet" href="./website/resources/styles/prism.css">
+    <script src="./website/resources/scripts/prism.js" defer></script>
+</head>
+
+<article class="markup">
+    
+    <h2>§ Hello world</h2>
+    <pre><code class="language-utkrisht">write "Hello World"</code></pre>
+
+    <p><code class="inline language-utkrisht">write</code> is a function and not a statement. Function calls do not require parentheses.</p>
+    
+    <h2>§ Comments</h2>
+    <pre><code class="language-utkrisht"># This is a comment</code></pre>
+    <p>Only single line comments are supported.</p>
+    
+    <pre><code class="language-utkrisht"># This is a documentation comment
+# which continues here and all lines 
+# before the container assignment 
+number: 100</code></pre>
+    
+    
+    <h2>§ Data types</h2>
+    
+    <p>
+        Utkrisht have 4 kinds of data types
+        <ol>
+            <li>Primitive data types
+                <ul>
+                    <li>String</li>
+                    <li>Number</li>
+                    <li>Boolean</li>
+                </ul>
+            </li>
+            <li>Procedural data types</li>
+            <li>Structural data types
+                <ul>
+                    <li>Object</li>
+                    <li>Array</li>
+                </ul>
+            </li>
+            <li>Null data types
+                <ul>
+                    <li>null</li>
+                    <li>undefined</li>
+                </ul>
+            </li>
+        </ol>
+    </p>
+    
+    <pre><code class="language-utkrisht"># String 
+"I program in Utkrisht 😼"
+
+# Number 
+-10.56
+
+# Boolean 
+right
+wrong 
+
+# Procedure 
+{write "Hello World"}
+
+# Array 
+[1, 2, 3]
+
+# Object 
+[name: "uki", age: 1]
+
+# Ecmascript null 
+esn
+
+# Ecmascript undefined 
+esu
+</code></pre>
+    
+    
+    <h2>§ Container</h2>
+    <p>Containers are identifiers which store data.</p>
+    <pre><code class="language-utkrisht">number: 5</code></pre>
+    
+    <p>Types of containers
+        <ol>
+            <li><strong>Variable:</strong> Container that stores a primitive</li>
+            <li><strong>Function:</strong> Container that stores a procedure</li>
+            <li><strong>Reference:</strong> Container that stores a structure</li>
+            <li><strong>Nullable:</strong> Container that stores nullables</li>
+        </ol>
+    </p>
+</article>
+
+<style>
+    pre {
+        font-family: "JetBrains Mono";
+        background: green;
+    }
+    
+</style>
