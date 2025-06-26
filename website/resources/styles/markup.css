@@ -84,16 +84,13 @@
     margin: 1em 2.5rem;
 }
 
+
 .markup hr {
-    box-sizing: content-box;
-    overflow: hidden;
-    background: transparent;
-    border-bottom: 1px solid #3d444db3;
-    height: .25em;
-    padding: 0;
-    margin: 1.5rem 0;
-    background-color: #3d444d;
-    border: 0;
+    border: none;
+    height: 2px;
+    background-color: var(--dark-gray);
+    margin: 40px 0 30px 0;
+    display: none;
 }
 
 
@@ -182,7 +179,7 @@
 .markup h4,
 .markup h5,
 .markup h6 {
-    margin-top: 5rem;
+    margin-top: 50px;
     margin-bottom: 1rem;
     font-weight: 600;
     line-height: 1.25;
@@ -192,7 +189,6 @@
     font-weight: 600;
     padding-bottom: .3em;
     font-size: 1.5em;
-    border-bottom: 1px solid #3d444db3;
 }
 
 .markup h3 {

@@ -1,0 +1,116 @@
+:root {
+    --almost-white: #E1E1E1;
+    --almost-black: #1A1A1A;
+    --steel: #9194A1;
+    --dark-gray: #363636;
+}
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("../fonts/jetbrains-mono/jetbrains-mono-variable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "Pretendard";
+    src: url("../fonts/pretendard/pretendard-variable.woff2") format("woff2");
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+
+img,
+data,
+input,
+select,
+textarea { 
+    display: block;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+img { 
+    height: auto;
+}
+
+input,
+button,
+select,
+textarea {
+    background: none;
+    border: none;
+    font: inherit;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    outline: none;
+}
+
+input,
+textarea { 
+    width: 100%; 
+}
+
+button { 
+    cursor: pointer; 
+}
+
+address { 
+    font-style: normal; 
+}
+
+html {
+    font-size: 10px;
+    scroll-behavior: smooth;
+    background-color: var(--almost-black);
+    color: var(--almost-white);
+    line-height: 1.6;
+    font-family: Pretendard, sans-serif;
+    overflow-x: scroll;
+    font-weight: 450;
+    letter-spacing: 0.4px;
+}
+
+body {
+    height: 100vh;
+    height: 100svh;
+    background-color: var(--almost-black);
+    font-size: 1.6rem;
+    display: grid;
+    grid-template-rows: 1fr 60px;
+}
+
+/* Disable pull to refresh */
+body, html {
+    overscroll-behavior: none;
+}
+
+
+
+
+
+
+
+
+
+

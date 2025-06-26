@@ -3,7 +3,7 @@
     "start_url": "../",
     "display": "standalone",
     "background_color": "#17181C",
-    "theme_color": "#033F6D",
+    "theme_color": "#17181C",
     "icons": [
         {
             "src": "resources/images/avatar.png",
