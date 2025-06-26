@@ -1,12 +1,12 @@
 {
     "name": "Webapp",
-    "start_url": "./index.html",
+    "start_url": "../",
     "display": "standalone",
     "background_color": "#17181C",
     "theme_color": "#033F6D",
     "icons": [
         {
-            "src": "./website/resources/images/avatar.png",
+            "src": "resources/images/avatar.png",
             "sizes": "350x350",
             "type": "image/png"
         }
