@@ -2,8 +2,8 @@
     "name": "Webapp",
     "start_url": "../",
     "display": "standalone",
-    "background_color": "#17181C",
-    "theme_color": "#17181C",
+    "background_color": "#1A1A1A",
+    "theme_color": "#1A1A1A",
     "icons": [
         {
             "src": "resources/images/avatar.png",
