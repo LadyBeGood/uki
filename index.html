@@ -10,7 +10,12 @@
     <script src="./website/resources/scripts/prism.js" defer></script>
 </head>
 <body>
-    <main></main>
+    <main>
+        <div class="loader-wrapper">
+            <div class="loader"></div>
+        </div>
+        <div id="origin"></div>
+    </main>
     
     <footer>
         <nav>
@@ -57,15 +62,15 @@
     
     
     html {
-        background-color: green;
+        background-color: var(--almost-black);
     }
     
     body {
-        background-color: var(--almost-white);
+        background-color: var(--almost-black);
         height: 100vh;
         height: 100svh;
         width: 100vw;
-        color: var(--light-gray);
+        color: var(--almost-white);
         font-size: 16px;
         font-family: Pretendard;
         color: black;
@@ -94,9 +99,35 @@
         padding: 20px 15px;
         line-height: 1.6;
         color: var(--almost-white);
+        position: relative;
     }
     
-    
+
+.loader-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.loader {
+    background: var(--almost-white);
+    width: 25px;
+    padding: 3px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    --_m: 
+      conic-gradient(#0000 10%,#000),
+      linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+            mask: var(--_m);
+    -webkit-mask-composite: source-out;
+            mask-composite: subtract;
+    animation: l3 1s infinite linear;
+}
+
+@keyframes l3 { to { transform: rotate(1turn); } }
+        
     footer {
         background-color: var(--azure);
     }
@@ -130,22 +161,27 @@
 
     
     async function Navigate(page) {
-    const container = document.querySelector("main");
+    const origin = document.querySelector("#origin");
+    const loader = document.querySelector("main .loader-wrapper");
+    
     let loadingTimeout = setTimeout(() => {
-        container.innerHTML = "Loading...";
-    }, 100); // delay showing "Loading..." by 100ms
+        origin.innerHTML = ""
+        loader.style.display = "block"
+    }, 100); 
 
     try {
         const response = await fetch(page + ".html");
         const html = await response.text();
         clearTimeout(loadingTimeout);
-        container.innerHTML = html;
+        loader.style.display = "none";
+        origin.innerHTML = html;
         Prism.highlightAll();
     } catch (error) {
         clearTimeout(loadingTimeout);
         const errorMessage = "Error fetching page: " + error;
         console.error(errorMessage);
-        container.innerHTML = errorMessage;
+        loader.style.display = "none";
+        origin.innerHTML = errorMessage;
     }
 }
     
