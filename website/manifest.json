@@ -2,17 +2,12 @@
     "name": "Webapp",
     "start_url": "/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#ffffff",
+    "background_color": "#17181C",
+    "theme_color": "#033F6D",
     "icons": [
         {
-            "src": "/icons/icon-192.png",
-            "sizes": "192x192",
-            "type": "image/png"
-        },
-        {
-            "src": "/icons/icon-512.png",
-            "sizes": "512x512",
+            "src": "./website/resources/images/avatar.png",
+            "sizes": "350x350",
             "type": "image/png"
         }
     ]
