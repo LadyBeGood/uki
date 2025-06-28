@@ -17,7 +17,7 @@ is-prime num:
 
 
 print-primes num-1, num-2: 
-    write "Prime numbers from || are:"
+    write "Prime numbers from |num-1| to |num-2| are:"
     
     loop num-1_num-2 with num
         when is-prime num
@@ -28,7 +28,6 @@ num-1: to-number prompt "What is your 1st number"
 num-2: to-number prompt "What is your 2nd number"
 
 print-primes num-1, num-2
-
 
 
 
@@ -64,7 +63,7 @@ prime-checker:
             text-content: "Prime Number Checker"
         
         input
-            input-type: "natural-number"
+            input-type: "number"
             input-placeholder: "Enter a number"
             input-value::number
         
@@ -72,9 +71,8 @@ prime-checker:
             event-click: {check}
             text-content: "Check"
         
-        element
+        element 
             text-content::result
-
 
 
 
@@ -115,4 +113,64 @@ twitter-title: "Twitter Title"
 twitter-description: "Twitter Description"
 twitter-image: "https://example.com/image.jpg"
 
+
+
+
+webapp:
+    count: 0
+    
+    exit % button
+        text-content: "Counter |$count|"
+        event-click: {count = count + 1}
+        box-size: 100px 35px
+
+
+render % origin
+    meta-title: "Counter app"
+    meta-description: "Example of a simple counter app made in Utkrisht language"
+    
+    webapp centre
+
+
+
+<!-- This is more or less what i want -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Counter app</title>
+    <meta name="description" content="Example of a simple counter app made in Utkrisht language" />
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: sans-serif;
+            background: #f9f9f9;
+        }
+        button {
+            width: 100px;
+            height: 35px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <button id="counter">Counter 0</button>
+
+    <script>
+        let count = 0;
+        const button = document.getElementById("counter");
+
+        button.addEventListener("click", () => {
+            count += 1;
+            button.textContent = `Counter ${count}`;
+        });
+    </script>
+</body>
+</html>
 
