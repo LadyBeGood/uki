@@ -1,4 +1,5 @@
-import uki/app
+import uki/prism
+
 
 
 is-prime num:
@@ -81,7 +82,6 @@ render % origin
     text-font: Arial, sans-serif
     box-colour: #F4F4F4
     box-inner-x: 15
-    custom-script: <script src="https://kit.fontawesome.com/24c3243e9d.js" crossorigin="anonymous"></script>
 
     prime-checker centre
 
@@ -132,45 +132,4 @@ render % origin
     webapp centre
 
 
-
-<!-- This is more or less what i want -->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Counter app</title>
-    <meta name="description" content="Example of a simple counter app made in Utkrisht language" />
-    <style>
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: sans-serif;
-            background: #f9f9f9;
-        }
-        button {
-            width: 100px;
-            height: 35px;
-            font-size: 14px;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <button id="counter">Counter 0</button>
-
-    <script>
-        let count = 0;
-        const button = document.getElementById("counter");
-
-        button.addEventListener("click", () => {
-            count += 1;
-            button.textContent = `Counter ${count}`;
-        });
-    </script>
-</body>
-</html>
 

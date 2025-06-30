@@ -1,11 +1,35 @@
 
-<head>
-    <link rel="stylesheet" href="./website/resources/styles/prism.css">
-    <script src="./website/resources/scripts/prism.js" defer></script>
-</head>
-
 <article class="markup">
+    <h2>Example</h2>
+    <pre><code class="language-utkrisht"># A program to print prime numbers between a user defined range
+
+is-prime num:
+    when num !> 1
+        exit wrong
+    else num = 2
+        exit right
+    else (remainder num, 2) = 0
+        exit wrong
+
+    loop 3_(power num, 0.5)_2 with i
+        when (remainder num, i) = 0
+            exit wrong
+
+    exit right
+
+
+print-primes num-1, num-2: 
+    write "Prime numbers from |num-1| to |num-2| are:"
     
+    loop num-1_num-2 with num
+        when is-prime num
+            write num
+
+
+num-1: to-number prompt "What is your 1st number" 
+num-2: to-number prompt "What is your 2nd number"
+
+print-primes num-1, num-2</code></pre>
     <h2>Hello world</h2>
     <pre><code class="language-utkrisht">write "Hello World"</code></pre>
     <p><code class="inline language-utkrisht">write</code> is a function and not a statement. Function calls do not require parentheses.</p>
@@ -39,7 +63,7 @@ number: 100</code></pre>
                     <li>Array</li>
                 </ul>
             </li>
-            <li>Null data types
+            <li>Nullish data types
                 <ul>
                     <li>null</li>
                     <li>undefined</li>
@@ -67,11 +91,11 @@ wrong
 # Object 
 [name: "uki", age: 1]
 
-# Ecmascript null 
-esn
+# Javascript null 
+js-null
 
-# Ecmascript undefined 
-esu
+# Javascript undefined 
+js-undefined
 </code></pre>
     
     
