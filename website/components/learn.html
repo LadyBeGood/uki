@@ -2,26 +2,6 @@
 <article class="markup">
     <h2>Example</h2>
     <pre><code class="language-utkrisht"># A program to print prime numbers between a user defined range
-
-parse-identifier-or-literal:
-    pos: lexer.pos
-    token: lexer.token
-    text: lexer.text
-    
-    lexer.scan
-    
-    when token = token.identifier
-        exit [kind: syntaxkind.identifier, text, pos, parent: undefined!]
-    else token = token.numeric-literal
-        exit [kind: syntaxkind.numeric-literal, value: to-number text, pos, parent: undefined!]
-    else token = token.string-literal
-        exit [kind: syntaxkind.string-literal, value: text, pos, parent: undefined!]
-    else
-        error pos, "Expected identifier or literal but got |token.token| with text |text|"
-        exit [kind: syntaxkind.identifier, text: "(missing)", pos, parent: undefined!]
-
-
-
 is-prime num:
     when num !> 1
         exit wrong
