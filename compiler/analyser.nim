@@ -1,5 +1,12 @@
 import types, sets, tables, error, sequtils
 
+type
+    ContainerInfo* = ref object
+        types*: HashSet[DataType]
+        assignable*: bool
+        line*: int
+        origin*: OriginKind
+
 
 proc analyser*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
     var scopes: seq[TableRef[string, HashSet[DataType]]] = @[]
@@ -8,7 +15,7 @@ proc analyser*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
     proc beginScope() =
         scopes.add(newTable[string, HashSet[DataType]]())
 
-    proc endScope() =.
+    proc endScope() =
         discard scopes.pop()
 
     proc addContext(context: Context) =

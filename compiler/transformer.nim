@@ -1,7 +1,8 @@
 import types
 
+#[
 type 
-    
+
     # Ecmascript expressions
     EcmascriptExpression* = ref object of RootObj
 
@@ -103,12 +104,11 @@ type
     EcmascriptBreakStatement* = ref object of EcmascriptStatement
         counter*: string
 
-
-
-
+]#
 
 
 proc transformer*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
+    #[
     var ecmascriptAbstractSyntaxTree: seq[EcmascriptStatement] = @[]
     
     proc expressionTransformer(expression: Expression): EcmascriptExpression =
@@ -348,8 +348,8 @@ proc transformer*(abstractSyntaxTree: seq[Statement]): seq[Statement] =
     
     for statement in abstractSyntaxTree:
         ecmascriptAbstractSyntaxTree.add(statementTransformer(statement))
-    
-    return ecmascriptAbstractSyntaxTree
+    ]#
+    return abstractSyntaxTree
 
 
 

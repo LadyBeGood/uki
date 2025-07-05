@@ -1,6 +1,7 @@
-import uki/prism
-
-
+import 
+    numpy ~ np
+    prismjs ~ prism
+    
 
 is-prime num:
     when num !> 1
@@ -17,6 +18,9 @@ is-prime num:
     exit right
 
 
+
+
+
 print-primes num-1, num-2: 
     write "Prime numbers from |num-1| to |num-2| are:"
     
@@ -31,50 +35,78 @@ num-2: to-number prompt "What is your 2nd number"
 print-primes num-1, num-2
 
 
+import math attach [sin, sqrt]
+import math assign m
+import utils/string detach [split]
+
+prefix
+
+let doubled = [1, 2, 3].map(x => x * 2); 
+doubled: [loop [1, 2, 3] with x (x * 2)]
+
+[1, 2, 3].forEach(x => console.log(x));
+loop [1, 2, 3] with x 
+    write x
+
+let evens = [1, 2, 3, 4].filter(x => x % 2 === 0);  
+evens: [
+    loop [1, 2, 3, 4] with x 
+        when (remainder x, 2) = 0 & x > 2
+            root x, 2
+        else is-prime x
+            x * x
+]
+
+
+import compiler.transformers.[transformers2020, transformers2022]
+import compiler.transformers.*
+
+
+
 
 
 
 # Unoptimised trial division algorithm
-is-prime number:
-    when number !> 1
+is-prime number: 
+    when number !> 1 
         exit wrong
-    
-    loop 2_<number with i
-        when (remainder number, i) = 0
+        
+    loop 2_<number with i 
+        when (remainder number, i) = 0 
             exit wrong
     
     exit right
 
 
-prime-checker:
+prime-checker: 
     # The value of input element is a string
     number: ""
     result: ""
 
-    check:
-        try
+    check: 
+        try 
             result = "|number| is |when !is-prime to-number number: "not "|a prime number"
-        fix
+        fix 
             # In case user passed an empty string or illegal characters as `number`
             result = "Please enter a valid positive integer"
-    
-    exit % element
-        heading
+
+        
+    exit % element 
+        heading 
             heading-type: 2
             text-content: "Prime Number Checker"
-        
-        input
+                
+        input 
             input-type: "number"
             input-placeholder: "Enter a number"
             input-value::number
-        
-        button
-            event-click: {check}
+                
+        button 
+            event-click: {check            
             text-content: "Check"
-        
+                
         element 
             text-content::result
-
 
 
 render % origin 
@@ -90,7 +122,6 @@ render % origin
 
 
 
-
 meta-title: "Title"
 meta-description: "Page description"
 meta-robots: "index, follow"
@@ -100,7 +131,7 @@ meta-colour-scheme: "light dark"
 meta-format-detection: "telephone = no"
 meta-referrer: "no-referrer"
 meta-application-name: "App Name"
-meta-http-equiv="refresh: "30"
+meta-http-equiv-refresh: 30
 
 open-graph-title: "Open Graph Title"
 open-graph-description: "Open Graph Description"
@@ -113,23 +144,6 @@ twitter-title: "Twitter Title"
 twitter-description: "Twitter Description"
 twitter-image: "https://example.com/image.jpg"
 
-
-
-
-webapp:
-    count: 0
-    
-    exit % button
-        text-content: "Counter |$count|"
-        event-click: {count = count + 1}
-        box-size: 100px 35px
-
-
-render % origin
-    meta-title: "Counter app"
-    meta-description: "Example of a simple counter app made in Utkrisht language"
-    
-    webapp centre
 
 
 

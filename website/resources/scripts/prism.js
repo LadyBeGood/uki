@@ -20,7 +20,7 @@ Prism.languages.utkrisht = {
     },
     'boolean': /\b(?:right|wrong)\b/,
     'function': {
-        pattern: /\b[a-z](?:[a-z0-9\-]*[a-z0-9])?\b(?=\s(?:[+-]?\d+|"[^"]*"|\b(?:right|wrong)\b|\b[a-z](?:[a-z0-9\-]*[a-z0-9])?\b|[(\[{]))/,
+        pattern: /\b[a-z](?:[a-z0-9\-]*[a-z0-9])?\b(?=\s(?:[+-]?\d+|:|"[^"]*"|\b(?:right|wrong)\b|\b[a-z](?:[a-z0-9\-]*[a-z0-9])?\b|[(\[{]))/,
         greedy: true,
         alias: 'function'
     },
